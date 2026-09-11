@@ -15,12 +15,14 @@ type Phase = "intro" | "questions" | "profile" | "lead" | "result";
 
 interface Props {
   scan: Scan;
+  /** Antwoorden uit een gedeelde resultaatlink (bv. uit de rapport-mail) — toont direct de uitslag. */
+  initialAnswers?: Answers | null;
 }
 
-export function ScanRunner({ scan }: Props) {
-  const [phase, setPhase] = useState<Phase>("intro");
+export function ScanRunner({ scan, initialAnswers }: Props) {
+  const [phase, setPhase] = useState<Phase>(initialAnswers ? "result" : "intro");
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
+  const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
   const [profile, setProfile] = useState<ProfileAnswers>({});
 
   const total = scan.questions.length + scan.profileQuestions.length;
@@ -89,7 +91,7 @@ export function ScanRunner({ scan }: Props) {
   }
 
   if (phase === "result") {
-    return <ScanResultView scan={scan} result={result} />;
+    return <ScanResultView scan={scan} result={result} answers={answers} />;
   }
 
   return (

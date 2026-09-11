@@ -3,34 +3,37 @@ import type { CategoryScore } from "@/lib/quickscan/types";
 interface Props {
   categories: CategoryScore[];
   lowestCode: string;
+  className?: string;
+  /** Grotere, vetgedrukte aslabels en meer canvasmarge — voor de modal. */
+  large?: boolean;
+  onClick?: () => void;
 }
 
-const SIZE = 460;
-const CENTER = SIZE / 2;
 const RADIUS = 100;
 const RING_FRACTIONS = [0.25, 0.5, 0.75, 1];
-const LABEL_RADIUS = RADIUS * 1.35;
-const MAX_LABEL_CHARS = 12;
 
-function point(angle: number, fraction: number) {
+function point(center: number, angle: number, fraction: number) {
   return {
-    x: CENTER + RADIUS * fraction * Math.cos(angle),
-    y: CENTER + RADIUS * fraction * Math.sin(angle),
+    x: center + RADIUS * fraction * Math.cos(angle),
+    y: center + RADIUS * fraction * Math.sin(angle),
   };
 }
 
-function polygonPoints(angles: number[], fractions: number[]) {
-  return angles.map((angle, i) => point(angle, fractions[i])).map((p) => `${p.x},${p.y}`).join(" ");
+function polygonPoints(center: number, angles: number[], fractions: number[]) {
+  return angles
+    .map((angle, i) => point(center, angle, fractions[i]))
+    .map((p) => `${p.x},${p.y}`)
+    .join(" ");
 }
 
 /** Breekt een lange categorienaam in maximaal drie regels op woordgrenzen. */
-function wrapLabel(text: string): string[] {
+function wrapLabel(text: string, maxChars: number): string[] {
   const words = text.split(" ");
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
     const candidate = current ? `${current} ${word}` : word;
-    if (candidate.length > MAX_LABEL_CHARS && current) {
+    if (candidate.length > maxChars && current) {
       lines.push(current);
       current = word;
     } else {
@@ -54,17 +57,38 @@ function labelAnchor(angle: number): "start" | "middle" | "end" {
  * percentages staan in de lijst eronder; dit diagram laat vooral de vorm
  * (sterke/zwakke onderdelen) in één oogopslag zien.
  */
-export function CategoryRadarChart({ categories, lowestCode }: Props) {
+export function CategoryRadarChart({
+  categories,
+  lowestCode,
+  className,
+  large,
+  onClick,
+}: Props) {
   const n = categories.length;
   if (n < 3) return null;
+
+  // Grotere weergave krijgt extra canvasmarge, anders lopen de dikkere,
+  // grotere labels tegen de rand van de viewBox aan (zelfde probleem als bij
+  // de eerste versie van dit diagram, nu vermeden door meer ruimte te geven
+  // in plaats van de labels te verkleinen).
+  const size = large ? 560 : 460;
+  const center = size / 2;
+  const labelRadius = RADIUS * (large ? 1.4 : 1.35);
+  const maxLabelChars = large ? 14 : 12;
+  const labelClassName = large
+    ? "fill-muted-foreground text-[16px] font-bold"
+    : "fill-muted-foreground text-[10px]";
 
   const angles = categories.map((_, i) => (2 * Math.PI * i) / n - Math.PI / 2);
   const dataFractions = categories.map((c) => Math.max(0, Math.min(1, c.percentage)));
 
   return (
     <svg
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
-      className="mx-auto w-full max-w-sm"
+      viewBox={`0 0 ${size} ${size}`}
+      className={[className ?? "mx-auto w-full max-w-sm", onClick ? "cursor-pointer" : ""]
+        .filter(Boolean)
+        .join(" ")}
+      onClick={onClick}
       role="img"
       aria-label="Spiderweb-diagram van de score per categorie — exacte percentages staan in de lijst hieronder"
     >
@@ -72,7 +96,7 @@ export function CategoryRadarChart({ categories, lowestCode }: Props) {
       {RING_FRACTIONS.map((fraction) => (
         <polygon
           key={fraction}
-          points={polygonPoints(angles, angles.map(() => fraction))}
+          points={polygonPoints(center, angles, angles.map(() => fraction))}
           className="fill-none stroke-border"
           strokeWidth={1}
         />
@@ -80,12 +104,12 @@ export function CategoryRadarChart({ categories, lowestCode }: Props) {
 
       {/* Assen vanuit het midden */}
       {angles.map((angle, i) => {
-        const outer = point(angle, 1);
+        const outer = point(center, angle, 1);
         return (
           <line
             key={i}
-            x1={CENTER}
-            y1={CENTER}
+            x1={center}
+            y1={center}
             x2={outer.x}
             y2={outer.y}
             className="stroke-border"
@@ -96,13 +120,13 @@ export function CategoryRadarChart({ categories, lowestCode }: Props) {
 
       {/* Data: gevulde polygon van de behaalde scores */}
       <polygon
-        points={polygonPoints(angles, dataFractions)}
+        points={polygonPoints(center, angles, dataFractions)}
         className="fill-appwizer-orange/10 stroke-appwizer-orange"
         strokeWidth={2}
         strokeLinejoin="round"
       />
       {categories.map((category, i) => {
-        const p = point(angles[i], dataFractions[i]);
+        const p = point(center, angles[i], dataFractions[i]);
         const isLowest = category.code === lowestCode;
         return (
           <circle
@@ -119,8 +143,8 @@ export function CategoryRadarChart({ categories, lowestCode }: Props) {
       {/* Labels: categorienaam per as, tot drie regels */}
       {categories.map((category, i) => {
         const angle = angles[i];
-        const labelPoint = point(angle, LABEL_RADIUS / RADIUS);
-        const lines = wrapLabel(category.name);
+        const labelPoint = point(center, angle, labelRadius / RADIUS);
+        const lines = wrapLabel(category.name, maxLabelChars);
         const dominantBaseline = Math.sin(angle) < -0.5 ? "auto" : Math.sin(angle) > 0.5 ? "hanging" : "middle";
         return (
           <text
@@ -129,7 +153,7 @@ export function CategoryRadarChart({ categories, lowestCode }: Props) {
             y={labelPoint.y}
             textAnchor={labelAnchor(angle)}
             dominantBaseline={dominantBaseline}
-            className="fill-muted-foreground text-[10px]"
+            className={labelClassName}
           >
             {lines.map((line, li) => (
               <tspan key={li} x={labelPoint.x} dy={li === 0 ? 0 : "1.15em"}>

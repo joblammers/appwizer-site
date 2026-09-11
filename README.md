@@ -21,7 +21,8 @@ src/
 │       ├── types.ts                 Alle typen (Scan, Question, Tier, ScanResult)
 │       ├── scoring.ts                Scorelogica — gedeeld door client en server
 │       ├── validate.ts              Regels uit "Een scan aanpassen" als functie
-│       ├── leads.ts                 saveLead() — antwoorden + uitslag naar quickscan_leads
+│       ├── leads.ts                 saveLead() (alleen complete scans) + getLeadStatsByScan() voor /admin
+│       ├── resultLink.ts            Antwoorden coderen in een URL — voor de link in de rapport-mail
 │       └── scans/
 │           ├── accountancy.ts       24 vragen + teksten, accountancyvariant
 │           ├── mkb.ts               24 vragen + teksten, MKB-variant
@@ -29,13 +30,17 @@ src/
 │           └── index.ts             Re-exports
 ├── components/
 │   ├── ThemeToggle.tsx              Licht/donker/systeem, rechtsboven op elke pagina
+│   ├── Modal.tsx                    Gedeelde popup (backdrop, Escape, sluitknop) — alleen nog voor de chart-zoom
+│   ├── CalBookingLink.tsx           Knop die Cal.com's boekingspopup opent (element-click embed)
 │   ├── admin/
 │   │   ├── ScanList.tsx             Scanoverzicht in /admin
-│   │   └── ScanEditor.tsx           Volledige scan-editor (categorieën, vragen, niveaus, JSON)
+│   │   ├── ScanEditor.tsx           Volledige scan-editor (categorieën, vragen, niveaus, JSON)
+│   │   ├── LeadOverview.tsx         Leads + gemiddelde score per scan, laatste 30 dagen
+│   │   └── LeadTrendChart.tsx       Sparkline van complete scans per dag (SVG, geen library)
 │   └── quickscan/
 │       ├── ScanRunner.tsx           Vraagflow, voortgang, fases
 │       ├── LeadForm.tsx             Leadformulier met validatie
-│       ├── ScanResult.tsx           Uitslag: score, spiderweb, balken, niveau, CTA
+│       ├── ScanResult.tsx           Uitslag: score, spiderweb, balken met drill-down per vraag, niveau, CTA
 │       └── CategoryRadarChart.tsx   Spiderweb-diagram van de score per categorie (SVG, geen library)
 └── app/
     ├── admin/
@@ -121,12 +126,45 @@ niet alleen via de UI.
 
 ## Ontwerpkeuzes
 
+**Cal.com's officiële element-click embed (`embed.js`), niet een eigen iframe.**
+`Cal.ns.quickscan("ui", {...})` in de root layout zet `styles.branding.brandColor`
+op het appwizer-oranje, zodat de geselecteerde datum in Cal's popup in het
+merkkleur staat. `CalBookingLink.tsx` rendert bewust een `<button>` zonder
+`href` als trigger — een `<a href target="_blank">` ernaast bleek niet
+betrouwbaar te onderdrukken door Cal's click-handler: bij testen opende een
+klik zowel de embed-popup als een los tabblad tegelijk. Een niet-navigerend
+element is precies wat Cal.com zelf als trigger aanbeveelt. `Modal.tsx` wordt
+nu alleen nog gebruikt voor de vergrootweergave van het spiderweb-diagram.
+
+**Uitslag delen via een gecodeerde link, niet via een database-id.** De
+rapport-mail linkt naar `/{slug}?r=<antwoorden, base64url>` — `resultLink.ts`
+codeert en decodeert dit. Geen sessie, account of databaserij nodig om een
+eerdere uitslag terug te zien; dat past bij een module die zonder database
+moet blijven werken. `[slug]/page.tsx` decodeert dit server-side (via de
+`searchParams`-prop, niet `useSearchParams()`) en geeft het door aan
+`ScanRunner`, die dan direct de resultaatfase toont in plaats van bij de
+intro te beginnen.
+
+**Alleen complete scans belanden in `quickscan_leads`.** De lead-route is een
+gewone POST-endpoint en dus ook direct aan te roepen buiten de UI om (zie de
+waarschuwing bij Server Functions hierboven) — zonder deze check zou een
+onvolledig of foutief verzoek de leadtabel vervuilen met rijen die voor een
+benchmark onbruikbaar zijn. `isComplete` checkt dat elke vraag uit
+`scan.questions` een antwoord heeft; de webhook en e-mails gaan wel altijd
+door, dit raakt alleen het opslaan.
+
 **Spiderweb náást de balken, niet in plaats van.** Een radar-diagram is prima
 voor "welke vorm heeft dit profiel" in één oogopslag, maar slecht voor exacte
 waarden en aslabels die op elkaar gaan lijken — dus blijft de balkenlijst
 eronder staan als het nauwkeurige, screenreader-vriendelijke overzicht. Puur
 SVG, geen chart-library: één statische diagram voor zes vaste categorieën
-rechtvaardigt geen dependency.
+rechtvaardigt geen dependency. Elke categorie is bovendien een `<details>` met
+de gestelde vragen, het gegeven antwoord en het percentage van die vraag
+erin — een drill-down zonder extra React state, puur met het native
+uitklapelement (chevron-icoon volgt de open/dicht-status via `group-open:`).
+Het diagram zelf heeft een vergrootknop: dezelfde `CategoryRadarChart` met een
+grotere `className` in een modal, waarbij de labels vanzelf meeschalen omdat
+alles in de SVG relatief aan de viewBox is opgebouwd.
 
 **Score wordt twee keer berekend.** De client rekent direct door voor een
 onmiddellijke uitslag; de server rekent opnieuw door bij het opslaan van de
@@ -166,14 +204,15 @@ ook via "Dupliceer als nieuwe scan" op `/admin`.
 - **Pdf-rapport.** De uitslag is nu alleen een webpagina. Wil je hetzelfde
   rapport als pdf, dan is `@react-pdf/renderer` of een Puppeteer-render van de
   uitslagpagina de logische route.
-- **De opvolgmails.** Het versturen van de vier berichten hoort thuis in je
+- **De opvolgmails.** Er gaat nu één rapport-mail naar de deelnemer (met een
+  link naar de uitslag, zie [Ontwerpkeuzes](#ontwerpkeuzes) hierboven) direct
+  na inzending. De rest van een drip-campagne hoort thuis in je
   e-mailplatform; de API-route zet de lead met score en niveau door zodat je
   daarop kunt segmenteren.
-- **Benchmark.** Leads (antwoorden + uitslag) staan sinds kort in
+- **Benchmark.** Complete leads (antwoorden + uitslag) staan sinds kort in
   `quickscan_leads` als `DATABASE_URL` gezet is (zie
   `src/lib/quickscan/leads.ts` — dezelfde database als de scaninhoud, zie
   [Admin-paneel](#admin-paneel-optioneel)). Er is alleen nog geen viewer voor
   die tabel en geen benchmarklogica: de uitslagpagina toont nog niet hoe
   iemand scoort ten opzichte van vergelijkbare organisaties, dat is de
   volgende stap zodra er genoeg leads binnen zijn.
-# appwizer-site

@@ -60,3 +60,51 @@ export async function saveLead(input: SaveLeadInput): Promise<void> {
     )
   `;
 }
+
+export interface ScanLeadStats {
+  scanSlug: string;
+  totalLeads: number;
+  averagePercentage: number;
+  /** Aantal complete scans per dag, laatste 30 dagen — voor de trendlijn in /admin. */
+  dailyCounts: { date: string; count: number }[];
+}
+
+/**
+ * Leadstatistieken per scan voor het admin-overzicht: totaal, gemiddelde
+ * score en een dagelijkse trend over de laatste 30 dagen. Alleen complete
+ * scans staan in deze tabel (zie de check in de lead-route), dus dit telt
+ * vanzelf alleen bruikbare inzendingen.
+ */
+export async function getLeadStatsByScan(): Promise<ScanLeadStats[]> {
+  if (!isDatabaseConfigured || !sql) return [];
+  try {
+    await bootstrap();
+
+    const totals = (await sql`
+      select scan_slug, count(*)::int as total, avg(percentage)::float as avg_percentage
+      from quickscan_leads
+      group by scan_slug
+    `) as { scan_slug: string; total: number; avg_percentage: number }[];
+
+    if (totals.length === 0) return [];
+
+    const daily = (await sql`
+      select scan_slug, to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as date, count(*)::int as count
+      from quickscan_leads
+      where created_at >= now() - interval '30 days'
+      group by scan_slug, date_trunc('day', created_at)
+      order by date_trunc('day', created_at)
+    `) as { scan_slug: string; date: string; count: number }[];
+
+    return totals.map((row) => ({
+      scanSlug: row.scan_slug,
+      totalLeads: row.total,
+      averagePercentage: row.avg_percentage,
+      dailyCounts: daily
+        .filter((d) => d.scan_slug === row.scan_slug)
+        .map((d) => ({ date: d.date, count: d.count })),
+    }));
+  } catch {
+    return [];
+  }
+}
