@@ -11,6 +11,7 @@ export const accountancyScan: Scan = {
     {
       code: "A",
       name: "Aanlevering & klantregie",
+      icon: "📬",
       weight: 0.2,
       lowScoreText:
         "De aanlevering door je klanten bepaalt je hele planning. Zolang stukken binnenkomen wanneer het de klant uitkomt, kun je je capaciteit niet plannen en verschuift het werk naar de piekmomenten rond de aangifte. De eerste ingreep is niet strenger zijn, maar makkelijker maken: één vaste digitale route, één moment per maand en een geautomatiseerde herinnering.",
@@ -18,6 +19,7 @@ export const accountancyScan: Scan = {
     {
       code: "B",
       name: "Applicatielandschap & koppelingen",
+      icon: "🔌",
       weight: 0.15,
       lowScoreText:
         "Elke handmatige overstap tussen twee applicaties is een plek waar tijd en kwaliteit weglekken. Begin met een plaat van je applicatielandschap: welke applicatie ondersteunt welke stap, en waar worden dezelfde gegevens twee keer ingevoerd. In de praktijk zitten daar bijna altijd twee of drie koppelingen die zichzelf binnen een jaar terugverdienen.",
@@ -25,6 +27,7 @@ export const accountancyScan: Scan = {
     {
       code: "C",
       name: "Verwerking & automatisering",
+      icon: "⚙️",
       weight: 0.2,
       lowScoreText:
         "Verwerking is de plek waar automatisering het snelst rendeert, maar alleen als je de uitval meet. Zonder cijfer over het aandeel handmatige correcties blijft het gissen welke klant of welke leverancier het probleem veroorzaakt. Meet vier weken lang, en de top vijf van oorzaken ligt er.",
@@ -32,6 +35,7 @@ export const accountancyScan: Scan = {
     {
       code: "D",
       name: "Datakwaliteit & vraagposten",
+      icon: "🔍",
       weight: 0.15,
       lowScoreText:
         "Vraagposten en tussenrekeningen die doorschuiven, zijn uitgesteld werk met rente. Wat in maart een vraag van één minuut aan de klant was, kost in december een halve dag reconstructie. Actieve monitoring op de vraagpostenrekening, met directe uitvraag bij de klant, is een van de ingrepen met de kortste terugverdientijd.",
@@ -39,6 +43,7 @@ export const accountancyScan: Scan = {
     {
       code: "E",
       name: "Periodeafsluiting & aangiften",
+      icon: "📅",
       weight: 0.15,
       lowScoreText:
         "Als perioden na rapportage open blijven staan, is geen enkel cijfer definitief en kan elke rapportage achteraf veranderen. Een vaste checklist met rolverdeling en een reviewstap, gevolgd door het daadwerkelijk sluiten van de periode, maakt van rapporteren een eindpunt in plaats van een tussenstand.",
@@ -46,6 +51,7 @@ export const accountancyScan: Scan = {
     {
       code: "F",
       name: "Sturing, meting & vastlegging",
+      icon: "🎯",
       weight: 0.15,
       lowScoreText:
         "Zonder meetpunt per processtap stuur je op uren en op klachten. Dat is achteraf sturen. Koppel aan elke stap uit je proces één cijfer — doorlooptijd, uitval, actualiteit — en je ziet afwijkingen op het moment dat je er nog iets aan kunt doen.",
@@ -346,6 +352,7 @@ export const accountancyScan: Scan = {
       id: "P1",
       text: "Wat past het best bij jouw organisatie?",
       type: "single",
+      section: "contact",
       options: [
         "Accountantskantoor",
         "Administratiekantoor",
@@ -359,6 +366,7 @@ export const accountancyScan: Scan = {
       id: "P2",
       text: "Hoeveel medewerkers werken er in de administratieve praktijk?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "1 – 4",
         "5 – 10",
@@ -371,6 +379,7 @@ export const accountancyScan: Scan = {
       id: "P3",
       text: "Welk boekhoudpakket gebruik je overwegend?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "Exact Online",
         "Twinfield",
@@ -384,6 +393,7 @@ export const accountancyScan: Scan = {
       id: "P4",
       text: "Hoeveel administraties verwerk je per maand?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "Minder dan 25",
         "25 – 75",
@@ -395,11 +405,13 @@ export const accountancyScan: Scan = {
       id: "P5",
       text: "Waar zit op dit moment je grootste frustratie in het proces?",
       type: "text",
+      section: "Wat wil je bereiken",
     },
     {
       id: "P6",
       text: "Wat wil je over twaalf maanden bereikt hebben?",
       type: "multi",
+      section: "Wat wil je bereiken",
       options: [
         "Minder handwerk in de verwerking",
         "Hogere marge per opdracht",

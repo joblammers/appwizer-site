@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ProfileQuestion } from "@/lib/quickscan/types";
 
 export interface LeadFields {
   firstName: string;
@@ -11,10 +12,12 @@ export interface LeadFields {
 }
 
 interface Props {
-  onSubmit: (lead: LeadFields) => Promise<void>;
+  /** Vragen met section === "contact" — bv. het type organisatie, gevraagd samen met de contactgegevens. */
+  extraQuestions: ProfileQuestion[];
+  onSubmit: (lead: LeadFields, extraAnswers: Record<string, string>) => void;
 }
 
-export function LeadForm({ onSubmit }: Props) {
+export function LeadForm({ extraQuestions, onSubmit }: Props) {
   const [fields, setFields] = useState<LeadFields>({
     firstName: "",
     email: "",
@@ -22,24 +25,25 @@ export function LeadForm({ onSubmit }: Props) {
     phone: "",
     consent: false,
   });
+  const [extraAnswers, setExtraAnswers] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   function update<K extends keyof LeadFields>(key: K, value: LeadFields[K]) {
     setFields((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function handleSubmit() {
+  function handleSubmit() {
     if (!fields.firstName.trim()) return setError("Vul je voornaam in.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email))
       return setError("Vul een geldig e-mailadres in.");
     if (!fields.company.trim()) return setError("Vul de naam van je organisatie in.");
+    for (const q of extraQuestions) {
+      if (!extraAnswers[q.id]) return setError(`Beantwoord: "${q.text}"`);
+    }
     if (!fields.consent) return setError("Zet een vinkje om je rapport te ontvangen.");
 
     setError(null);
-    setBusy(true);
-    await onSubmit(fields);
-    setBusy(false);
+    onSubmit(fields, extraAnswers);
   }
 
   const inputClass =
@@ -48,10 +52,10 @@ export function LeadForm({ onSubmit }: Props) {
   return (
     <div>
       <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-        Je scan is klaar
+        Voordat je begint
       </h2>
       <p className="mt-3 text-muted-foreground">
-        Vul je gegevens in om je score en je persoonlijke verbeterrapport te bekijken.
+        We sturen je score en verbeterrapport hierheen zodra je klaar bent.
       </p>
 
       <div className="mt-8 space-y-4">
@@ -86,6 +90,35 @@ export function LeadForm({ onSubmit }: Props) {
           onChange={(e) => update("phone", e.target.value)}
         />
 
+        {extraQuestions.map((q) => (
+          <div key={q.id}>
+            <p className="mb-2 text-sm font-medium text-foreground">{q.text}</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {q.options?.map((option) => {
+                const isSelected = extraAnswers[q.id] === option;
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() =>
+                      setExtraAnswers((prev) => ({ ...prev, [q.id]: option }))
+                    }
+                    aria-pressed={isSelected}
+                    className={[
+                      "rounded-lg border px-4 py-2.5 text-left text-sm transition",
+                      isSelected
+                        ? "border-appwizer-orange bg-appwizer-orange/10 text-foreground"
+                        : "border-border bg-surface text-foreground hover:border-appwizer-blue hover:bg-surface-hover",
+                    ].join(" ")}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
         <label className="flex items-start gap-3 text-sm text-muted-foreground">
           <input
             type="checkbox"
@@ -117,10 +150,9 @@ export function LeadForm({ onSubmit }: Props) {
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={busy}
-        className="mt-8 w-full rounded-lg bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+        className="mt-8 w-full rounded-lg bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110"
       >
-        {busy ? "Moment…" : "Bekijk mijn uitslag"}
+        Start de scan
       </button>
     </div>
   );

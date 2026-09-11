@@ -11,6 +11,7 @@ export const mkbScan: Scan = {
     {
       code: "A",
       name: "Inkoop & factuurverwerking",
+      icon: "📥",
       weight: 0.2,
       lowScoreText:
         "Inkoopfacturen die via persoonlijke mailboxen binnenkomen, zijn de belangrijkste bron van vertraging in de hele keten: ze worden te laat geboekt, te laat goedgekeurd en te laat betaald. Eén centraal factuuradres met automatische herkenning is bijna altijd de ingreep met de kortste terugverdientijd, omdat hij tegelijk het zoekwerk, de betalingsherinneringen en de correcties wegneemt.",
@@ -18,6 +19,7 @@ export const mkbScan: Scan = {
     {
       code: "B",
       name: "Verkoop, facturatie & debiteuren",
+      icon: "📤",
       weight: 0.2,
       lowScoreText:
         "Elke dag dat een factuur later de deur uitgaat, is een dag extra werkkapitaal. Bij een organisatie van jouw omvang betekent vijf dagen sneller factureren al snel een structureel lager debiteurensaldo. Begin bij de bron: waar wacht de facturatie op — op uren, op een projectstatus, of op een goedkeuring die niemand bewaakt?",
@@ -25,6 +27,7 @@ export const mkbScan: Scan = {
     {
       code: "C",
       name: "Applicatielandschap & koppelingen",
+      icon: "🔌",
       weight: 0.15,
       lowScoreText:
         "Elke handmatige overstap tussen twee applicaties is een plek waar tijd en kwaliteit weglekken. Begin met een plaat van je applicatielandschap: welke applicatie ondersteunt welke stap, en waar worden dezelfde gegevens twee keer ingevoerd. In de praktijk zitten daar bijna altijd twee of drie koppelingen die zichzelf binnen een jaar terugverdienen.",
@@ -32,6 +35,7 @@ export const mkbScan: Scan = {
     {
       code: "D",
       name: "Betaalproces & autorisatie",
+      icon: "💳",
       weight: 0.15,
       lowScoreText:
         "Het betaalproces is de stap met het hoogste risico per handeling. Wie de betaallijst opstelt, wie hem controleert en binnen welke termijn dat gebeurt, hoort net zo hard vastgelegd te zijn als de bedragen zelf. Een beschreven betaalproces met functiescheiding en een vaste accordeertermijn kost een dagdeel om vast te leggen en dekt het grootste enkelvoudige risico in de administratie af.",
@@ -39,6 +43,7 @@ export const mkbScan: Scan = {
     {
       code: "E",
       name: "Maandafsluiting & rapportage",
+      icon: "📊",
       weight: 0.2,
       lowScoreText:
         "Maandcijfers die na drie weken komen, zijn geschiedschrijving en geen sturing. De doorlooptijd van de afsluiting is bijna nooit een capaciteitsprobleem, maar een volgordeprobleem: er wordt gewacht op stukken, op goedkeuringen en op posten die nog uitgezocht moeten worden. Een afsluitkalender met een deadline per stap haalt er doorgaans een week af zonder extra inzet.",
@@ -46,6 +51,7 @@ export const mkbScan: Scan = {
     {
       code: "F",
       name: "Organisatie, rollen & continuïteit",
+      icon: "👥",
       weight: 0.1,
       lowScoreText:
         "Als het proces in één hoofd zit, is elke vakantie een risico en elke overname een verrassing. Processen beschrijven is geen papieren exercitie: het maakt vervanging mogelijk, maakt functiescheiding aantoonbaar en is de voorwaarde om überhaupt te kunnen meten waar het misloopt.",
@@ -346,6 +352,7 @@ export const mkbScan: Scan = {
       id: "P1",
       text: "In welke sector is jouw organisatie actief?",
       type: "single",
+      section: "contact",
       options: [
         "Techniek, engineering & advies",
         "Bouw & installatie",
@@ -359,6 +366,7 @@ export const mkbScan: Scan = {
       id: "P2",
       text: "Hoeveel medewerkers telt de organisatie?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "10 – 50",
         "51 – 100",
@@ -370,6 +378,7 @@ export const mkbScan: Scan = {
       id: "P3",
       text: "Welk ERP- of boekhoudpakket gebruiken jullie?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "Exact",
         "AFAS",
@@ -385,6 +394,7 @@ export const mkbScan: Scan = {
       id: "P4",
       text: "Hoe groot is de financiële afdeling?",
       type: "single",
+      section: "Algemeen profiel",
       options: [
         "1 fte",
         "2 – 3 fte",
@@ -396,11 +406,13 @@ export const mkbScan: Scan = {
       id: "P5",
       text: "Waar zit op dit moment je grootste frustratie in de administratie?",
       type: "text",
+      section: "Wat wil je bereiken",
     },
     {
       id: "P6",
       text: "Wat wil je over twaalf maanden bereikt hebben?",
       type: "multi",
+      section: "Wat wil je bereiken",
       options: [
         "Snellere maandcijfers",
         "Minder handwerk in de verwerking",

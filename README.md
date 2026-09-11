@@ -35,10 +35,11 @@ src/
 │   ├── admin/
 │   │   ├── ScanList.tsx             Scanoverzicht in /admin
 │   │   ├── ScanEditor.tsx           Volledige scan-editor (categorieën, vragen, niveaus, JSON)
-│   │   ├── LeadOverview.tsx         Leads + gemiddelde score per scan, laatste 30 dagen
-│   │   └── LeadTrendChart.tsx       Sparkline van complete scans per dag (SVG, geen library)
+│   │   ├── LeadOverview.tsx         Alle scans in één overzicht: lijngrafiek + tabel met scan/bedrijf/categorieën
+│   │   └── LeadTrendChart.tsx       Eén lijn per scan, laatste 30 dagen (SVG, geen library)
 │   └── quickscan/
-│       ├── ScanRunner.tsx           Vraagflow, voortgang, fases
+│       ├── ScanRunner.tsx           Vraagflow, voortgang, fases, introscherm (tekst + optionele afbeelding)
+│       ├── IntroContent.tsx         Lichte opmaak voor de intro: alinea's + opsommingslijsten
 │       ├── LeadForm.tsx             Leadformulier met validatie
 │       ├── ScanResult.tsx           Uitslag: score, spiderweb, balken met drill-down per vraag, niveau, CTA
 │       └── CategoryRadarChart.tsx   Spiderweb-diagram van de score per categorie (SVG, geen library)
@@ -126,6 +127,50 @@ niet alleen via de UI.
 
 ## Ontwerpkeuzes
 
+**Categoriekolommen in /admin zijn positioneel, niet op naam.** `mkb` en
+`accountancy` gebruiken toevallig dezelfde codes (A–F) voor inhoudelijk
+andere categorieën — kolommen samenvoegen op code of naam zou twee losse
+dingen door elkaar tonen. De tabel toont daarom "Categorie 1" t/m "Categorie
+N" (N = het hoogste aantal categorieën van alle scans) en indexeert
+`lead.categoryScores` op positie, wat wél consistent is: die array volgt de
+volgorde van `scan.categories` op het moment van opslaan.
+
+**Icoon per categorie is een los tekstveld (emoji), geen icon-library.** Eén
+`icon?: string` op `Category`, getoond vóór de naam in de vraag-eyebrow en de
+uitslaglijst. Geen dependency, geen iconenset om te onderhouden — de admin
+plakt gewoon een emoji.
+
+**Introtekst is platte tekst met een kleine parser, geen rich-text editor.**
+Een lege regel breekt een alinea af; regels die met "- " beginnen worden een
+lijst, ook meteen na een gewone regel (een inleidende zin gevolgd door
+bullets, zonder lege regel ertussen) — dat laatste ging in de eerste versie
+mis: bullets binnen hetzelfde blok als voorafgaande tekst werden dan één
+platte zin met losse "- "-tekens. `IntroContent.tsx` verwerkt daarom regel
+voor regel in plaats van per dubbele-newline-blok. De introafbeelding is een
+losse URL (`Scan.introImage`), geen upload — past bij een module zonder
+opslag voor bestanden.
+
+**Vraagpunten zijn per vraag, niet één vast maximum voor de hele scan.**
+`MAX_POINTS_PER_QUESTION` (altijd 4, want altijd vijf antwoorden) is vervangen
+door `maxPointsForQuestion()`: het laatste antwoord van díé vraag, ongeacht
+hoeveel antwoorden dat er zijn. Categoriemaxima zijn daarom de som van elke
+vraag zijn eigen maximum, niet `aantal vragen × 4`. Dit maakt het mogelijk om
+per vraag 2, 3 of 4 antwoorden te gebruiken én de punten per antwoord vrij te
+wegen (het eerste antwoord blijft 0, de rest moet strikt oplopen) zonder de
+bestaande vijf-antwoorden-vragen ongeldig te maken.
+
+**Bedrijfsgegevens vooraf, niet pas na de scorevragen.** `ScanRunner`s
+fasevolgorde is intro → contact → vragen → profiel → uitslag. Een
+profielvraag met `section: "contact"` (bv. het type organisatie) wordt in
+`LeadForm` mee gevraagd naast naam/e-mail/bedrijf/telefoon, vóórdat de
+scorevragen beginnen; de rest van de profielvragen blijft ná de scorevragen
+staan, gegroepeerd op hun (vrije) `section`-waarde als sectiekop — zo ontstaat
+bijvoorbeeld een "Algemeen profiel"- en "Wat wil je bereiken"-sectie zonder
+dat de datastructuur een aparte lijst per sectie nodig heeft. De echte
+POST naar `/api/quickscan/lead` gebeurt nog steeds pas aan het eind (met alle
+antwoorden erbij) — alleen het momentum waarop de bezoeker zijn gegevens
+invult is naar voren gehaald.
+
 **Cal.com's officiële element-click embed (`embed.js`), niet een eigen iframe.**
 `Cal.ns.quickscan("ui", {...})` in de root layout zet `styles.branding.brandColor`
 op het appwizer-oranje, zodat de geselecteerde datum in Cal's popup in het
@@ -190,8 +235,9 @@ tekstwijziging in dat bestand — geen componentwijziging. Let op twee dingen
 (ook gecontroleerd in `src/lib/quickscan/validate.ts`, en dus ook afgedwongen
 in het admin-paneel):
 
-- Elke vraag heeft exact vijf antwoorden met `points` 0 t/m 4, in oplopende
-  volgorde.
+- Elke vraag heeft minstens twee antwoorden. Het eerste antwoord is altijd 0
+  punten waard, de rest loopt strikt op — verder vrij te kiezen, dus niet per
+  se in stappen van 1 (dat is de weging per antwoord).
 - De som van alle `weight`-waarden moet 1 zijn.
 
 Een derde scan toevoegen zonder admin-paneel: maak een nieuw bestand naar

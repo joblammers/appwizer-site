@@ -2,8 +2,9 @@ import type { Scan } from "./types";
 
 /**
  * Dezelfde regels als in de README onder "Een scan aanpassen": elke vraag
- * heeft exact vijf antwoorden met punten 0 t/m 4 in oplopende volgorde, en de
- * som van alle categoriewegingen is 1.
+ * heeft minstens twee antwoorden, met punten die bij het eerste antwoord op
+ * 0 beginnen en daarna strikt oplopen (niet per se in stappen van 1 — de
+ * punten zijn de weging per antwoord). De som van alle categoriewegingen is 1.
  */
 export function validateScan(scan: Scan): string[] {
   const errors: string[] = [];
@@ -29,14 +30,16 @@ export function validateScan(scan: Scan): string[] {
     if (!categoryCodes.has(question.category)) {
       errors.push(`${label}: onbekende categorie "${question.category}".`);
     }
-    if (question.options.length !== 5) {
-      errors.push(`${label}: moet exact 5 antwoorden hebben (nu ${question.options.length}).`);
+    if (question.options.length < 2) {
+      errors.push(`${label}: moet minstens 2 antwoorden hebben (nu ${question.options.length}).`);
       continue;
     }
     const points = question.options.map((o) => o.points);
-    const expected = [0, 1, 2, 3, 4];
-    if (points.some((p, i) => p !== expected[i])) {
-      errors.push(`${label}: punten moeten oplopend 0, 1, 2, 3, 4 zijn.`);
+    if (points[0] !== 0) {
+      errors.push(`${label}: het eerste antwoord moet 0 punten waard zijn.`);
+    }
+    if (points.some((p, i) => i > 0 && p <= points[i - 1])) {
+      errors.push(`${label}: punten moeten strikt oplopen per antwoord.`);
     }
   }
 

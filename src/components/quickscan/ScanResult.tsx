@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Answers, Scan, ScanResult } from "@/lib/quickscan/types";
-import { formatPercentage, MAX_POINTS_PER_QUESTION } from "@/lib/quickscan/scoring";
+import { formatPercentage, maxPointsForQuestion } from "@/lib/quickscan/scoring";
 import { Modal } from "@/components/Modal";
 import { CalBookingLink } from "@/components/CalBookingLink";
 import { CategoryRadarChart } from "./CategoryRadarChart";
@@ -108,6 +108,9 @@ export function ScanResultView({ scan, result, answers }: Props) {
           const questions = scan.questions.filter(
             (q) => q.category === category.code,
           );
+          const categoryIcon = scan.categories.find(
+            (c) => c.code === category.code,
+          )?.icon;
           return (
             <li key={category.code}>
               <details className="group rounded-lg border border-border bg-surface open:pb-2">
@@ -117,6 +120,7 @@ export function ScanResultView({ scan, result, answers }: Props) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between text-sm">
                         <span className="font-medium text-foreground">
+                          {categoryIcon && <span className="mr-1.5">{categoryIcon}</span>}
                           {category.name}
                         </span>
                         <span className="tabular-nums text-muted-foreground">
@@ -160,7 +164,7 @@ export function ScanResultView({ scan, result, answers }: Props) {
                       (o) => o.points === answers[question.id],
                     );
                     const fraction = chosen
-                      ? chosen.points / MAX_POINTS_PER_QUESTION
+                      ? chosen.points / maxPointsForQuestion(question)
                       : 0;
                     return (
                       <li key={question.id}>

@@ -5,13 +5,15 @@ import type {
   Answers,
   LeadPayload,
   ProfileAnswers,
+  ProfileQuestion,
   Scan,
 } from "@/lib/quickscan/types";
 import { scoreScan } from "@/lib/quickscan/scoring";
-import { LeadForm } from "./LeadForm";
+import { LeadForm, type LeadFields } from "./LeadForm";
 import { ScanResultView } from "./ScanResult";
+import { IntroContent } from "./IntroContent";
 
-type Phase = "intro" | "questions" | "profile" | "lead" | "result";
+type Phase = "intro" | "contact" | "questions" | "profile" | "result";
 
 interface Props {
   scan: Scan;
@@ -24,23 +26,50 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
   const [profile, setProfile] = useState<ProfileAnswers>({});
+  const [lead, setLead] = useState<LeadFields | null>(null);
 
-  const total = scan.questions.length + scan.profileQuestions.length;
+  // "contact"-vragen (bv. type organisatie) horen bij de bedrijfsgegevens
+  // vooraf; de rest blijft de profielfase ná de scorevragen.
+  const contactQuestions = useMemo(
+    () => scan.profileQuestions.filter((q) => q.section === "contact"),
+    [scan.profileQuestions],
+  );
+  const laterProfileQuestions = useMemo(
+    () => scan.profileQuestions.filter((q) => q.section !== "contact"),
+    [scan.profileQuestions],
+  );
+
+  const total = scan.questions.length + laterProfileQuestions.length;
   const answered =
-    Object.keys(answers).length + Object.keys(profile).length;
+    Object.keys(answers).length +
+    laterProfileQuestions.filter((q) => profile[q.id] !== undefined).length;
   const progress = Math.round((answered / total) * 100);
 
   const result = useMemo(() => scoreScan(scan, answers), [scan, answers]);
 
+  function startQuestions(fields: LeadFields, extraAnswers: Record<string, string>) {
+    setLead(fields);
+    setProfile((prev) => ({ ...prev, ...extraAnswers }));
+    setPhase("questions");
+    setIndex(0);
+  }
+
   function chooseAnswer(questionId: number, points: number) {
-    setAnswers((prev) => ({ ...prev, [questionId]: points }));
+    // Bewust niet de functionele setState-vorm: we hebben de bijgewerkte
+    // antwoorden direct nodig voor submitLead() hierna, en die loopt in een
+    // setTimeout — daar zou de closure over de oude `answers` nog de net
+    // gegeven laatste keuze missen.
+    const updatedAnswers = { ...answers, [questionId]: points };
+    setAnswers(updatedAnswers);
     // Korte vertraging zodat de selectie zichtbaar is voordat we doorschuiven.
     window.setTimeout(() => {
       if (index + 1 < scan.questions.length) {
         setIndex(index + 1);
-      } else {
+      } else if (laterProfileQuestions.length > 0) {
         setPhase("profile");
         setIndex(0);
+      } else {
+        submitLead(updatedAnswers, profile);
       }
     }, 180);
   }
@@ -50,11 +79,33 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
   }
 
   function nextProfile() {
-    if (index + 1 < scan.profileQuestions.length) {
+    if (index + 1 < laterProfileQuestions.length) {
       setIndex(index + 1);
     } else {
-      setPhase("lead");
+      submitLead(answers, profile);
     }
+  }
+
+  async function submitLead(finalAnswers: Answers, finalProfile: ProfileAnswers) {
+    if (lead) {
+      const payload: LeadPayload = {
+        ...lead,
+        scanSlug: scan.slug,
+        answers: finalAnswers,
+        profile: finalProfile,
+      };
+      try {
+        await fetch("/api/quickscan/lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      } catch {
+        // De uitslag tonen we hoe dan ook; een mislukte lead-registratie
+        // mag de deelnemer nooit blokkeren.
+      }
+    }
+    setPhase("result");
   }
 
   function back() {
@@ -67,18 +118,20 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
   }
 
   if (phase === "intro") {
-    return (
-      <section className="mx-auto max-w-2xl px-4 py-14 text-center sm:px-6 sm:py-20">
+    const introBody = (
+      <>
         <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-orange">
           {scan.audience}
         </p>
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
           {scan.title}
         </h1>
-        <p className="mt-6 text-lg text-muted-foreground">{scan.intro}</p>
+        <div className="mt-6">
+          <IntroContent text={scan.intro} />
+        </div>
         <button
           type="button"
-          onClick={() => setPhase("questions")}
+          onClick={() => setPhase("contact")}
           className="mt-10 w-full rounded-lg bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-appwizer-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto"
         >
           Start de scan
@@ -86,6 +139,35 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
         <p className="mt-4 text-sm text-muted-foreground">
           24 vragen · ongeveer 6 minuten · je uitslag zie je direct
         </p>
+      </>
+    );
+
+    if (scan.introImage) {
+      return (
+        <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="flex flex-col gap-8 text-center sm:flex-row sm:items-center sm:text-left">
+            <img
+              src={scan.introImage}
+              alt=""
+              className="mx-auto w-48 shrink-0 rounded-2xl object-cover sm:mx-0 sm:w-64"
+            />
+            <div>{introBody}</div>
+          </div>
+        </section>
+      );
+    }
+
+    return (
+      <section className="mx-auto max-w-2xl px-4 py-14 text-center sm:px-6 sm:py-20">
+        {introBody}
+      </section>
+    );
+  }
+
+  if (phase === "contact") {
+    return (
+      <section className="mx-auto max-w-2xl px-4 pt-16 pb-10 sm:px-6 sm:pt-16 sm:pb-12">
+        <LeadForm extraQuestions={contactQuestions} onSubmit={startQuestions} />
       </section>
     );
   }
@@ -96,7 +178,7 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
 
   return (
     <section className="mx-auto max-w-2xl px-4 pt-16 pb-10 sm:px-6 sm:pt-16 sm:pb-12">
-      <ProgressBar value={phase === "lead" ? 100 : progress} />
+      <ProgressBar value={progress} />
 
       {phase === "questions" && (
         <QuestionStep
@@ -111,35 +193,12 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
       {phase === "profile" && (
         <ProfileStep
           scan={scan}
+          questions={laterProfileQuestions}
           index={index}
           profile={profile}
           onAnswer={setProfileAnswer}
           onNext={nextProfile}
           onBack={back}
-        />
-      )}
-
-      {phase === "lead" && (
-        <LeadForm
-          onSubmit={async (lead) => {
-            const payload: LeadPayload = {
-              ...lead,
-              scanSlug: scan.slug,
-              answers,
-              profile,
-            };
-            try {
-              await fetch("/api/quickscan/lead", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-            } catch {
-              // De uitslag tonen we hoe dan ook; een mislukte lead-registratie
-              // mag de deelnemer nooit blokkeren.
-            }
-            setPhase("result");
-          }}
         />
       )}
     </section>
@@ -204,6 +263,7 @@ function QuestionStep({
   return (
     <div>
       <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
+        {category?.icon && <span className="mr-1.5">{category.icon}</span>}
         {category?.name}
       </p>
       <h2 className="mt-3 text-xl font-semibold text-foreground sm:text-2xl">
@@ -240,6 +300,7 @@ function QuestionStep({
 
 function ProfileStep({
   scan,
+  questions,
   index,
   profile,
   onAnswer,
@@ -247,14 +308,16 @@ function ProfileStep({
   onBack,
 }: {
   scan: Scan;
+  questions: ProfileQuestion[];
   index: number;
   profile: ProfileAnswers;
   onAnswer: (id: string, value: string | string[]) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
-  const question = scan.profileQuestions[index];
+  const question = questions[index];
   const value = profile[question.id];
+  const eyebrow = question.section || `Nog een paar vragen over je ${scan.subject}`;
 
   function toggleMulti(option: string) {
     const current = Array.isArray(value) ? value : [];
@@ -267,7 +330,7 @@ function ProfileStep({
   return (
     <div>
       <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
-        Nog een paar vragen over je {scan.subject}
+        {eyebrow}
       </p>
       <h2 className="mt-3 text-xl font-semibold text-foreground sm:text-2xl">
         {question.text}
@@ -321,7 +384,7 @@ function ProfileStep({
           onClick={onNext}
           className="rounded-lg bg-appwizer-orange px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
         >
-          {index + 1 < scan.profileQuestions.length ? "Volgende" : "Naar mijn uitslag"}
+          {index + 1 < questions.length ? "Volgende" : "Naar mijn uitslag"}
         </button>
       </div>
     </div>

@@ -150,14 +150,26 @@ export function ScanEditor({ scan: initialScan }: Props) {
               onChange={(e) => update("subject", e.target.value)}
             />
           </Field>
+          <Field label="Introafbeelding (URL, optioneel)">
+            <input
+              className={inputClass}
+              value={scan.introImage ?? ""}
+              placeholder="https://..."
+              onChange={(e) => update("introImage", e.target.value)}
+            />
+          </Field>
         </div>
         <Field label="Intro" className="mt-4">
           <textarea
-            rows={3}
+            rows={5}
             className={inputClass}
             value={scan.intro}
             onChange={(e) => update("intro", e.target.value)}
           />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Lege regel = nieuwe alinea. Regels die beginnen met &quot;- &quot;
+            worden een opsommingslijst.
+          </p>
         </Field>
       </section>
 
@@ -345,7 +357,7 @@ function CategoriesSection({
   function add() {
     onChange([
       ...categories,
-      { code: `categorie-${categories.length + 1}`, name: "", weight: 0, lowScoreText: "" },
+      { code: `categorie-${categories.length + 1}`, name: "", weight: 0, lowScoreText: "", icon: "" },
     ]);
   }
 
@@ -367,7 +379,15 @@ function CategoriesSection({
       <div className="mt-4 space-y-4">
         {categories.map((category, index) => (
           <div key={index} className="rounded-lg border border-border p-4">
-            <div className="grid gap-3 sm:grid-cols-[1fr_2fr_120px_auto] sm:items-end">
+            <div className="grid gap-3 sm:grid-cols-[80px_1fr_2fr_120px_auto] sm:items-end">
+              <Field label="Icoon">
+                <input
+                  className={inputClass}
+                  value={category.icon ?? ""}
+                  placeholder="📥"
+                  onChange={(e) => updateAt(index, { icon: e.target.value })}
+                />
+              </Field>
               <Field label="Code">
                 <input
                   className={inputClass}
@@ -438,6 +458,27 @@ function QuestionsSection({
     updateAt(qIndex, { options });
   }
 
+  function updateOptionPoints(qIndex: number, oIndex: number, points: number) {
+    const question = questions[qIndex];
+    const options = [...question.options];
+    options[oIndex] = { ...options[oIndex], points };
+    updateAt(qIndex, { options });
+  }
+
+  function addOption(qIndex: number) {
+    const question = questions[qIndex];
+    const maxPoints = Math.max(0, ...question.options.map((o) => o.points));
+    updateAt(qIndex, {
+      options: [...question.options, { points: maxPoints + 1, label: "" }],
+    });
+  }
+
+  function removeOption(qIndex: number, oIndex: number) {
+    const question = questions[qIndex];
+    if (question.options.length <= 2) return;
+    updateAt(qIndex, { options: question.options.filter((_, i) => i !== oIndex) });
+  }
+
   function add() {
     onChange([
       ...questions,
@@ -445,7 +486,7 @@ function QuestionsSection({
         id: nextId(questions),
         category: categories[0]?.code ?? "",
         text: "",
-        options: [0, 1, 2, 3, 4].map((points) => ({ points, label: "" })),
+        options: [0, 1, 2, 3].map((points) => ({ points, label: "" })),
       },
     ]);
   }
@@ -487,19 +528,33 @@ function QuestionsSection({
             </div>
 
             <div className="mt-3 space-y-2">
-              <span className={labelClass}>Antwoorden (0 t/m 4 punten)</span>
+              <span className={labelClass}>
+                Antwoorden — punten lopen op vanaf 0, hoger = beter
+              </span>
               {question.options.map((option, oIndex) => (
-                <div key={option.points} className="flex items-center gap-2">
-                  <span className="w-6 shrink-0 text-sm text-muted-foreground">
-                    {option.points}
-                  </span>
+                <div key={oIndex} className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    disabled={oIndex === 0}
+                    className={`${inputClass} w-16 shrink-0 tabular-nums disabled:opacity-60`}
+                    value={option.points}
+                    onChange={(e) =>
+                      updateOptionPoints(qIndex, oIndex, Number(e.target.value))
+                    }
+                  />
                   <input
                     className={inputClass}
                     value={option.label}
                     onChange={(e) => updateOptionLabel(qIndex, oIndex, e.target.value)}
                   />
+                  <IconButton
+                    onClick={() => removeOption(qIndex, oIndex)}
+                  >
+                    Verwijder
+                  </IconButton>
                 </div>
               ))}
+              <IconButton onClick={() => addOption(qIndex)}>+ Antwoord toevoegen</IconButton>
             </div>
 
             <div className="mt-3">
@@ -576,6 +631,15 @@ function ProfileQuestionsSection({
                 </select>
               </Field>
             </div>
+
+            <Field label="Sectie" className="mt-3">
+              <input
+                className={inputClass}
+                value={question.section ?? ""}
+                placeholder='"contact" = bij bedrijfsgegevens vooraf, of een vrije sectienaam voor een kop later (bv. "Algemeen profiel")'
+                onChange={(e) => updateAt(index, { section: e.target.value })}
+              />
+            </Field>
 
             {question.type !== "text" && (
               <Field label="Opties" className="mt-3">

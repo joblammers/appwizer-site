@@ -1,13 +1,17 @@
 import { isDatabaseConfigured } from "@/lib/db";
 import { getScans } from "@/lib/quickscan/scans";
-import { getLeadStatsByScan } from "@/lib/quickscan/leads";
+import { getAllLeadRows, getLeadStatsByScan } from "@/lib/quickscan/leads";
 import { ScanList } from "@/components/admin/ScanList";
 import { LeadOverview } from "@/components/admin/LeadOverview";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHomePage() {
-  const [scans, leadStats] = await Promise.all([getScans(), getLeadStatsByScan()]);
+  const [scans, leadStats, leadRows] = await Promise.all([
+    getScans(),
+    getLeadStatsByScan(),
+    getAllLeadRows(),
+  ]);
 
   return (
     <div>
@@ -23,7 +27,7 @@ export default async function AdminHomePage() {
       )}
 
       <div className="mt-8">
-        <LeadOverview scans={scans} stats={leadStats} />
+        <LeadOverview scans={scans} stats={leadStats} leads={leadRows} />
       </div>
 
       <div className="mt-6">

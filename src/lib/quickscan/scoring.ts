@@ -1,13 +1,22 @@
 import type {
   Answers,
   CategoryScore,
+  Question,
   Scan,
   ScanResult,
   Tier,
 } from "./types";
 
-/** Maximale punten per vraag. Vijf antwoorden, 0 t/m 4. */
-export const MAX_POINTS_PER_QUESTION = 4;
+/**
+ * Maximale punten voor een vraag: elke vraag heeft zijn eigen aantal
+ * antwoorden (2 of meer) en eigen puntenweging per antwoord — het eerste
+ * antwoord is altijd 0, de rest oplopend, dus de laatste optie is het
+ * maximum (zie validate.ts).
+ */
+export function maxPointsForQuestion(question: Question): number {
+  const last = question.options[question.options.length - 1];
+  return last ? last.points : 0;
+}
 
 /**
  * Bepaalt het niveau bij een score.
@@ -42,7 +51,10 @@ export function findTier(scan: Scan, percentage: number): Tier {
 export function scoreScan(scan: Scan, answers: Answers): ScanResult {
   const categories: CategoryScore[] = scan.categories.map((category) => {
     const questions = scan.questions.filter((q) => q.category === category.code);
-    const maxPoints = questions.length * MAX_POINTS_PER_QUESTION;
+    const maxPoints = questions.reduce(
+      (sum, q) => sum + maxPointsForQuestion(q),
+      0,
+    );
     const points = questions.reduce(
       (sum, q) => sum + (answers[q.id] ?? 0),
       0,

@@ -1,5 +1,5 @@
 import { isDatabaseConfigured, sql } from "@/lib/db";
-import type { Answers, ProfileAnswers, ScanResult } from "./types";
+import type { Answers, CategoryScore, ProfileAnswers, ScanResult } from "./types";
 
 let bootstrapped: Promise<void> | null = null;
 
@@ -103,6 +103,50 @@ export async function getLeadStatsByScan(): Promise<ScanLeadStats[]> {
       dailyCounts: daily
         .filter((d) => d.scan_slug === row.scan_slug)
         .map((d) => ({ date: d.date, count: d.count })),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export interface LeadRow {
+  id: number;
+  scanSlug: string;
+  company: string;
+  percentage: number;
+  createdAt: string;
+  categoryScores: CategoryScore[];
+}
+
+/**
+ * Individuele complete leads (nieuwste eerst) voor de drill-down in /admin —
+ * bedrijfsnaam, totaalscore en score per categorie, zodat die als kolommen
+ * getoond kunnen worden per scan.
+ */
+export async function getAllLeadRows(): Promise<LeadRow[]> {
+  if (!isDatabaseConfigured || !sql) return [];
+  try {
+    await bootstrap();
+    const rows = (await sql`
+      select id, scan_slug, company, percentage::float as percentage, category_scores, created_at
+      from quickscan_leads
+      order by created_at desc
+    `) as {
+      id: number;
+      scan_slug: string;
+      company: string;
+      percentage: number;
+      category_scores: CategoryScore[];
+      created_at: string;
+    }[];
+
+    return rows.map((row) => ({
+      id: row.id,
+      scanSlug: row.scan_slug,
+      company: row.company,
+      percentage: row.percentage,
+      createdAt: row.created_at,
+      categoryScores: row.category_scores,
     }));
   } catch {
     return [];

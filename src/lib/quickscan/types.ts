@@ -25,6 +25,8 @@ export interface Category {
   weight: number;
   /** Tekstblok dat wordt getoond wanneer dit de laagst scorende categorie is. */
   lowScoreText: string;
+  /** Optioneel emoji-icoon, getoond vóór de categorienaam in vraag en uitslag. */
+  icon?: string;
 }
 
 export type ProfileQuestionType = "single" | "multi" | "text";
@@ -34,6 +36,12 @@ export interface ProfileQuestion {
   text: string;
   type: ProfileQuestionType;
   options?: string[];
+  /**
+   * Groepering. De speciale waarde "contact" laat de vraag meteen bij de
+   * bedrijfsgegevens tonen, vóór de scorevragen — elke andere (vrije) waarde
+   * wordt een sectiekop in de profielfase ná de scorevragen. Leeg = geen kop.
+   */
+  section?: string;
 }
 
 export interface Tier {
@@ -52,7 +60,13 @@ export interface Scan {
   title: string;
   subtitle: string;
   audience: string;
+  /**
+   * Lege regel = nieuwe alinea. Een regel die met "- " begint, wordt een
+   * opsommingsteken (opeenvolgende "- "-regels vormen samen één lijst).
+   */
   intro: string;
+  /** Optionele afbeelding links van de introtekst op het startscherm (URL). */
+  introImage?: string;
   /** "kantoor" of "organisatie" — gebruikt in de call to action. */
   subject: string;
   categories: Category[];
