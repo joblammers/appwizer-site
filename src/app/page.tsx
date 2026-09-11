@@ -30,7 +30,7 @@ export default async function QuickscanIndexPage() {
           {scans.map((scan) => (
             <Link
               key={scan.slug}
-              href={`/quickscan/${scan.slug}`}
+              href={`/${scan.slug}`}
               className="group rounded-xl border border-border bg-surface p-6 transition hover:border-appwizer-orange sm:p-8"
             >
               <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">

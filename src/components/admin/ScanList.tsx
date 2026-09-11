@@ -71,7 +71,7 @@ function ScanRow({ scan }: { scan: Scan }) {
             {scan.title}
           </Link>
           <p className="text-sm text-muted-foreground">
-            /quickscan/{scan.slug} · {scan.questions.length} vragen ·{" "}
+            /{scan.slug} · {scan.questions.length} vragen ·{" "}
             {scan.categories.length} categorieën
           </p>
         </div>

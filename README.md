@@ -42,10 +42,15 @@ src/
     │   ├── login/page.tsx           Wachtwoordformulier
     │   ├── actions.ts               Server actions: opslaan/aanmaken/verwijderen
     │   └── (protected)/             Lijst (page.tsx) + editor ([slug]/page.tsx)
-    ├── quickscan/page.tsx           Keuzepagina met beide scans
-    ├── quickscan/[slug]/page.tsx    /quickscan/mkb en /quickscan/administratiekantoor
+    ├── page.tsx                     Keuzepagina met beide scans, op "/"
+    ├── [slug]/page.tsx              /mkb en /accountancy
     └── api/quickscan/lead/route.ts  Leadverwerking
 ```
+
+De module draait op een eigen (sub)domein — bijvoorbeeld `quickscan.appwizer.com` —
+zonder WordPress ervoor. `next.config.ts`'s `WORDPRESS_ORIGIN`-fallback is dus
+optioneel: laat hem leeg als er geen bestaande site achter dit domein hoeft
+door te schemeren.
 
 ## Installeren in een bestaand Next.js-project
 
@@ -79,7 +84,7 @@ ADMIN_PASSWORD=
 DATABASE_URL=
 ```
 
-5. `npm run dev` en ga naar `/quickscan`.
+5. `npm run dev` en ga naar `/`.
 
 ## Admin-paneel (optioneel)
 
@@ -96,13 +101,18 @@ Twee variabelen zijn er samen verantwoordelijk voor:
   maar kan er niets worden opgeslagen (`saveScan`/`deleteScan` gooien dan een
   duidelijke fout). Op Vercel: koppel Neon via de Storage-tab, dan wordt deze
   automatisch gezet. De tabel (`quickscan_scans`) en de eerste seed vanuit de
-  bestaande scans worden bij de eerste admin-actie automatisch aangemaakt.
+  bestaande scans worden bij de eerste admin-actie automatisch aangemaakt —
+  maar alleen als de tabel op dat moment leeg is. Stond er al een rij in
+  (bijvoorbeeld van eerder handmatig testen), dan wint die en wordt de
+  `.ts`-inhoud stilzwijgend overgeslagen; controleer na het instellen van
+  `DATABASE_URL` dus even of de slugs in `/admin` overeenkomen met de
+  `.ts`-bestanden.
 
-Zodra `DATABASE_URL` gezet is, lezen `/quickscan` én `/admin` uit de database
-in plaats van uit de `.ts`-bestanden — die blijven dan alleen de
+Zodra `DATABASE_URL` gezet is, lezen `/` én `/admin` uit de database in
+plaats van uit de `.ts`-bestanden — die blijven dan alleen de
 initiële/seed-inhoud. Beide routes zijn daarom dynamisch gerenderd (niet meer
-statisch voorgerenderd): een wijziging in `/admin` is direct zichtbaar op
-`/quickscan`, zonder redeploy.
+statisch voorgerenderd): een wijziging in `/admin` is direct zichtbaar op de
+site, zonder redeploy.
 
 Beveiliging: `src/proxy.ts` blokkeert onbevoegde navigatie naar `/admin/*`, en
 elke server action in `src/app/admin/actions.ts` controleert de sessie

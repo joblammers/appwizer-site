@@ -96,7 +96,9 @@ export function LeadForm({ onSubmit }: Props) {
           <span>
             Ja, stuur mij mijn rapport en de verdiepende inzichten per e-mail. Zie de{" "}
             <a
-              href="/privacy"
+              href="https://appwizer.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"
             >
               privacyverklaring

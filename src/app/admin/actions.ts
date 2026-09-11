@@ -19,8 +19,8 @@ export interface ScanActionResult {
 function revalidateScanPaths(slug: string) {
   revalidatePath("/admin");
   revalidatePath(`/admin/${slug}`);
-  revalidatePath("/quickscan");
-  revalidatePath(`/quickscan/${slug}`);
+  revalidatePath("/");
+  revalidatePath(`/${slug}`);
 }
 
 export async function saveScanAction(

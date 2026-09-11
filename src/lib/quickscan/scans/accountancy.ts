@@ -1,7 +1,7 @@
 import type { Scan } from "../types";
 
 export const accountancyScan: Scan = {
-  slug: "administratiekantoor",
+  slug: "accountancy",
   title: "Hoe volwassen is jouw administratieve proces?",
   subtitle: "Ontdek in zes minuten waar in je kantoor de meeste tijd weglekt.",
   audience: "Voor accountants- en administratiekantoren",
