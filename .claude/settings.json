@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next *)",
+      "Bash(npx eslint *)",
+      "Bash(grep -o \"<html[^>]*>\\\\|<body[^>]*>\\\\|<head>\" /tmp/quickscan.html | head -10; echo \"---\"; grep -o \"<title>[^<]*</title>\" /tmp/quickscan.html)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s http://localhost:3000/quickscan -o /tmp/quickscan2.html -w \"status: %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"root: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/quickscan: %{http_code}\\\\n\" http://localhost:3000/quickscan)",
+      "Bash(curl -s -o /dev/null -w \"/quickscan/mkb: %{http_code}\\\\n\" http://localhost:3000/quickscan/mkb)",
+      "Bash(curl -s -o /dev/null -w \"/quickscan/administratiekantoor: %{http_code}\\\\n\" http://localhost:3000/quickscan/administratiekantoor)",
+      "Bash(curl -s -o /dev/null -D - http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"quickscan: %{http_code}\\\\n\" http://localhost:3000/quickscan)",
+      "Bash(WORDPRESS_ORIGIN=https://wp.appwizer.com npx next build)",
+      "Bash(env)",
+      "Bash(chromium-cli --help)",
+      "Bash(command -v chromium-cli)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(npm init *)",
+      "Bash(npx playwright *)",
+      "Bash(mkdir -p shots)",
+      "Bash(node verify.js)",
+      "Bash(node verify2.js)",
+      "Bash(node verify3.js)",
+      "Bash(mkdir -p \"src/app/admin/login\" \"src/app/admin/\\(protected\\)/[slug]\")"
+    ],
+    "additionalDirectories": [
+      "/Users/joblammers/Documents/Development/Apps/appwizer-site/src/app/admin/(protected)"
+    ]
+  }
+}

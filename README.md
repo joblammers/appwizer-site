@@ -21,6 +21,7 @@ src/
 │       ├── types.ts                 Alle typen (Scan, Question, Tier, ScanResult)
 │       ├── scoring.ts                Scorelogica — gedeeld door client en server
 │       ├── validate.ts              Regels uit "Een scan aanpassen" als functie
+│       ├── leads.ts                 saveLead() — antwoorden + uitslag naar quickscan_leads
 │       └── scans/
 │           ├── accountancy.ts       24 vragen + teksten, accountancyvariant
 │           ├── mkb.ts               24 vragen + teksten, MKB-variant
@@ -34,7 +35,8 @@ src/
 │   └── quickscan/
 │       ├── ScanRunner.tsx           Vraagflow, voortgang, fases
 │       ├── LeadForm.tsx             Leadformulier met validatie
-│       └── ScanResult.tsx           Uitslag: score, balken, niveau, CTA
+│       ├── ScanResult.tsx           Uitslag: score, spiderweb, balken, niveau, CTA
+│       └── CategoryRadarChart.tsx   Spiderweb-diagram van de score per categorie (SVG, geen library)
 └── app/
     ├── admin/
     │   ├── login/page.tsx           Wachtwoordformulier
@@ -109,6 +111,13 @@ niet alleen via de UI.
 
 ## Ontwerpkeuzes
 
+**Spiderweb náást de balken, niet in plaats van.** Een radar-diagram is prima
+voor "welke vorm heeft dit profiel" in één oogopslag, maar slecht voor exacte
+waarden en aslabels die op elkaar gaan lijken — dus blijft de balkenlijst
+eronder staan als het nauwkeurige, screenreader-vriendelijke overzicht. Puur
+SVG, geen chart-library: één statische diagram voor zes vaste categorieën
+rechtvaardigt geen dependency.
+
 **Score wordt twee keer berekend.** De client rekent direct door voor een
 onmiddellijke uitslag; de server rekent opnieuw door bij het opslaan van de
 lead, omdat client-invoer geen betrouwbare bron is. Beide gebruiken dezelfde
@@ -150,9 +159,11 @@ ook via "Dupliceer als nieuwe scan" op `/admin`.
 - **De opvolgmails.** Het versturen van de vier berichten hoort thuis in je
   e-mailplatform; de API-route zet de lead met score en niveau door zodat je
   daarop kunt segmenteren.
-- **Benchmark.** Leads zelf staan nog niet in een database — alleen de
-  scaninhoud (vragen, categorieën, niveaus) kan optioneel in Postgres staan,
-  zie [Admin-paneel](#admin-paneel-optioneel). Zodra leads ook worden
-  opgeslagen (bijvoorbeeld in dezelfde database), kan de uitslagpagina tonen
-  hoe iemand scoort ten opzichte van vergelijkbare organisaties.
+- **Benchmark.** Leads (antwoorden + uitslag) staan sinds kort in
+  `quickscan_leads` als `DATABASE_URL` gezet is (zie
+  `src/lib/quickscan/leads.ts` — dezelfde database als de scaninhoud, zie
+  [Admin-paneel](#admin-paneel-optioneel)). Er is alleen nog geen viewer voor
+  die tabel en geen benchmarklogica: de uitslagpagina toont nog niet hoe
+  iemand scoort ten opzichte van vergelijkbare organisaties, dat is de
+  volgende stap zodra er genoeg leads binnen zijn.
 # appwizer-site

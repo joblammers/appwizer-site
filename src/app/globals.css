@@ -1,26 +1,49 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/*
+ * Tailwind v4 wordt in CSS geconfigureerd, niet in een JS-bestand.
+ * Elke variabele met het voorvoegsel --color- levert automatisch de bijbehorende
+ * utility-classes op: --color-appwizer-orange geeft bg-appwizer-orange,
+ * text-appwizer-orange, border-appwizer-orange, ring-appwizer-orange en
+ * accent-appwizer-orange. Opacity-modifiers als bg-appwizer-orange/10 werken
+ * zonder extra configuratie.
+ */
 @theme inline {
+  --color-appwizer-orange: #df7d3c;
+  --color-appwizer-blue: #5c94cd;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a; /* slate-900 */
+  --muted-foreground: #475569; /* slate-600 */
+  --surface: #f8fafc; /* slate-50 */
+  --surface-hover: #f1f5f9; /* slate-100 */
+  --border: #e2e8f0; /* slate-200 */
+}
+
+/*
+ * ThemeToggle.tsx zet deze klasse op <html> (rechtstreeks, niet via Tailwinds
+ * dark:-variant) op basis van de opgeslagen voorkeur of het systeemthema.
+ */
+.dark {
+  --background: #0f172a; /* slate-900 */
+  --foreground: #f8fafc; /* slate-50 */
+  --muted-foreground: #94a3b8; /* slate-400 */
+  --surface: #1e293b; /* slate-800 */
+  --surface-hover: #29374b;
+  --border: #334155; /* slate-700 */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
