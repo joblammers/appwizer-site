@@ -77,6 +77,7 @@ export async function POST(request: Request) {
     // leadtabel niet vervuilen met onbruikbare rijen.
     isComplete
       ? saveLead({
+          leadId: payload.leadId,
           scanSlug: scan.slug,
           firstName: lead.firstName,
           email: lead.email,

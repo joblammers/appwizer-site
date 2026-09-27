@@ -23,7 +23,7 @@ export function LeadForm({ extraQuestions, onSubmit }: Props) {
     email: "",
     company: "",
     phone: "",
-    consent: false,
+    consent: true,
   });
   const [extraAnswers, setExtraAnswers] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +129,7 @@ export function LeadForm({ extraQuestions, onSubmit }: Props) {
           <span>
             Ja, stuur mij mijn rapport en de verdiepende inzichten per e-mail. Zie de{" "}
             <a
-              href="https://appwizer.com/privacy"
+              href="/privacyverklaring"
               target="_blank"
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"

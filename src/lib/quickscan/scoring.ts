@@ -98,3 +98,21 @@ export function scoreScan(scan: Scan, answers: Answers): ScanResult {
 export function formatPercentage(fraction: number): string {
   return `${Math.round(fraction * 100)}%`;
 }
+
+export type ScoreRatingTone = "low" | "medium" | "high";
+
+export interface ScoreRating {
+  label: string;
+  tone: ScoreRatingTone;
+}
+
+/**
+ * Vaste driebandclassificatie (rood/oranje/groen) voor de score-badge en de
+ * thermometer — los van de per-scan ingestelde niveaus (Tier), die vrije
+ * tekst zijn en niet in precies drie gelijke banden vallen.
+ */
+export function rateScore(fraction: number): ScoreRating {
+  if (fraction < 0.4) return { label: "Laag", tone: "low" };
+  if (fraction < 0.7) return { label: "Gemiddeld", tone: "medium" };
+  return { label: "Hoog", tone: "high" };
+}

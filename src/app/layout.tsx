@@ -1,7 +1,23 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+/**
+ * Alleen gebruikt door de homepage (marketing-ontwerp met een vaste,
+ * altijd-lichte huisstijl) — via CSS-variabelen, zodat de rest van de app
+ * (quiz, admin) gewoon de standaard sans-stack blijft gebruiken.
+ */
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-sans",
+});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
+});
 
 export const metadata: Metadata = {
   title: "appwizer",
@@ -37,7 +53,7 @@ Cal.ns.quickscan("ui", {"styles":{"branding":{"brandColor":"#DF7D3C"}},"hideEven
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="nl">
+    <html lang="nl" className={`${ibmPlexSans.variable} ${spaceGrotesk.variable}`}>
       <body>
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInitScript}
@@ -45,7 +61,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="cal-embed-init" strategy="afterInteractive">
           {calInitScript}
         </Script>
-        <ThemeToggle />
         {children}
       </body>
     </html>

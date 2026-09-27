@@ -69,6 +69,8 @@ export interface Scan {
   introImage?: string;
   /** "kantoor" of "organisatie" — gebruikt in de call to action. */
   subject: string;
+  /** Standaard true (ontbreekt bij bestaande scans) — false verbergt de scan uit publieke lijsten (bv. de footer), maar de URL blijft direct bereikbaar. */
+  visible?: boolean;
   categories: Category[];
   questions: Question[];
   profileQuestions: ProfileQuestion[];
@@ -106,6 +108,8 @@ export interface ScanResult {
 }
 
 export interface LeadPayload {
+  /** Id van een eerdere startLead()-rij (zie /api/quickscan/lead/start) om bij te werken in plaats van een tweede rij aan te maken. */
+  leadId?: number | null;
   scanSlug: string;
   firstName: string;
   email: string;
@@ -113,5 +117,15 @@ export interface LeadPayload {
   phone?: string;
   consent: boolean;
   answers: Answers;
+  profile: ProfileAnswers;
+}
+
+/** Payload voor /api/quickscan/lead/start — contactgegevens vóór de scorevragen. */
+export interface LeadStartPayload {
+  scanSlug: string;
+  firstName: string;
+  email: string;
+  company: string;
+  phone?: string;
   profile: ProfileAnswers;
 }

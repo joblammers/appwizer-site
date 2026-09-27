@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type {
   Answers,
   LeadPayload,
+  LeadStartPayload,
   ProfileAnswers,
   ProfileQuestion,
   Scan,
@@ -19,14 +20,17 @@ interface Props {
   scan: Scan;
   /** Antwoorden uit een gedeelde resultaatlink (bv. uit de rapport-mail) — toont direct de uitslag. */
   initialAnswers?: Answers | null;
+  /** Gemiddelde score per categoriecode van andere deelnemers van déze scan — voor de peergroup-vergelijking op de uitslagpagina. */
+  peerScores?: Record<string, number>;
 }
 
-export function ScanRunner({ scan, initialAnswers }: Props) {
+export function ScanRunner({ scan, initialAnswers, peerScores }: Props) {
   const [phase, setPhase] = useState<Phase>(initialAnswers ? "result" : "intro");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Answers>(initialAnswers ?? {});
   const [profile, setProfile] = useState<ProfileAnswers>({});
   const [lead, setLead] = useState<LeadFields | null>(null);
+  const [leadId, setLeadId] = useState<number | null>(null);
 
   // "contact"-vragen (bv. type organisatie) horen bij de bedrijfsgegevens
   // vooraf; de rest blijft de profielfase ná de scorevragen.
@@ -49,9 +53,34 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
 
   function startQuestions(fields: LeadFields, extraAnswers: Record<string, string>) {
     setLead(fields);
-    setProfile((prev) => ({ ...prev, ...extraAnswers }));
+    const startProfile = { ...profile, ...extraAnswers };
+    setProfile(startProfile);
     setPhase("questions");
     setIndex(0);
+
+    // Bewaart de contactgegevens meteen, vóór de scorevragen — zo blijft een
+    // afgebroken scan zichtbaar in /admin in plaats van spoorloos te
+    // verdwijnen. Nooit blokkerend: de vraagflow start hierboven al.
+    const startPayload: LeadStartPayload = {
+      scanSlug: scan.slug,
+      firstName: fields.firstName,
+      email: fields.email,
+      company: fields.company,
+      phone: fields.phone,
+      profile: startProfile,
+    };
+    fetch("/api/quickscan/lead/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(startPayload),
+    })
+      .then((res) => res.json())
+      .then((data: { leadId?: number | null }) => {
+        if (typeof data.leadId === "number") setLeadId(data.leadId);
+      })
+      .catch(() => {
+        // Geen leadId beschikbaar — submitLead() valt terug op een nieuwe insert.
+      });
   }
 
   function chooseAnswer(questionId: number, points: number) {
@@ -90,6 +119,7 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
     if (lead) {
       const payload: LeadPayload = {
         ...lead,
+        leadId,
         scanSlug: scan.slug,
         answers: finalAnswers,
         profile: finalProfile,
@@ -173,7 +203,14 @@ export function ScanRunner({ scan, initialAnswers }: Props) {
   }
 
   if (phase === "result") {
-    return <ScanResultView scan={scan} result={result} answers={answers} />;
+    return (
+      <ScanResultView
+        scan={scan}
+        result={result}
+        answers={answers}
+        peerScores={peerScores}
+      />
+    );
   }
 
   return (

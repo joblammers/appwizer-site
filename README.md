@@ -35,8 +35,9 @@ src/
 │   ├── admin/
 │   │   ├── ScanList.tsx             Scanoverzicht in /admin
 │   │   ├── ScanEditor.tsx           Volledige scan-editor (categorieën, vragen, niveaus, JSON)
-│   │   ├── LeadOverview.tsx         Alle scans in één overzicht: lijngrafiek + tabel met scan/bedrijf/categorieën
-│   │   └── LeadTrendChart.tsx       Eén lijn per scan, laatste 30 dagen (SVG, geen library)
+│   │   ├── LeadOverview.tsx         Alle scans in één overzicht: staafdiagram + tabel met scan/bedrijf/categorieën
+│   │   ├── ScanScoreChart.tsx       Gemiddelde totaalscore per scan, één balk per scan (SVG, geen library)
+│   │   └── LeadDetail.tsx           Eén ingevulde scan ("entered scan"): score, spiderweb, antwoorddrill-down, profiel
 │   └── quickscan/
 │       ├── ScanRunner.tsx           Vraagflow, voortgang, fases, introscherm (tekst + optionele afbeelding)
 │       ├── IntroContent.tsx         Lichte opmaak voor de intro: alinea's + opsommingslijsten
@@ -47,7 +48,7 @@ src/
     ├── admin/
     │   ├── login/page.tsx           Wachtwoordformulier
     │   ├── actions.ts               Server actions: opslaan/aanmaken/verwijderen
-    │   └── (protected)/             Lijst (page.tsx) + editor ([slug]/page.tsx)
+    │   └── (protected)/             Lijst (page.tsx) + scan-editor ([slug]/page.tsx) + ingevulde scan (leads/[id]/page.tsx)
     ├── page.tsx                     Keuzepagina met beide scans, op "/"
     ├── [slug]/page.tsx              /mkb en /accountancy
     └── api/quickscan/lead/route.ts  Leadverwerking
@@ -134,6 +135,24 @@ dingen door elkaar tonen. De tabel toont daarom "Categorie 1" t/m "Categorie
 N" (N = het hoogste aantal categorieën van alle scans) en indexeert
 `lead.categoryScores` op positie, wat wél consistent is: die array volgt de
 volgorde van `scan.categories` op het moment van opslaan.
+
+**Scanvergelijking in /admin is een staafdiagram, geen tijdlijn.** Eerdere
+versie plotte de gemiddelde score per dag als lijn over de laatste 30 dagen,
+maar met doorgaans een handvol leads per scan — vaak zelfs allemaal op
+dezelfde dag binnengekomen — gaf dat losse stipjes zonder zichtbare lijn en
+geen leesbare vergelijking. "Welke scan scoort hoger" is een
+magnitude-vraag, geen tijdreeks, dus `ScanScoreChart` toont nu één balk per
+scan met de gemiddelde totaalscore, direct gelabeld met percentage,
+scannaam en aantal leads (geen aparte legenda nodig zolang elke balk al een
+label draagt).
+
+**"Scan" in de leadtabel opent de ingevulde scan, niet het sjabloon.** De
+kolom linkt naar `/admin/leads/[id]` (`LeadDetail.tsx`) — de contactgegevens
+en antwoorden van díe ene deelnemer, met dezelfde spiderweb-chart en
+rood-groen antwoorddrill-down als de resultaatpagina die de deelnemer zelf
+ziet. Het scan-sjabloon (`/admin/[slug]`) blijft apart bereikbaar via de
+"Bewerken"-knop in de scanlijst eronder — die twee dingen door elkaar linken
+was de eerdere (verkeerde) opzet.
 
 **Icoon per categorie is een los tekstveld (emoji), geen icon-library.** Eén
 `icon?: string` op `Category`, getoond vóór de naam in de vraag-eyebrow en de

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getScan } from "@/lib/quickscan/scans";
+import { getCategoryAverages } from "@/lib/quickscan/leads";
 import { decodeAnswers } from "@/lib/quickscan/resultLink";
 import { ScanRunner } from "@/components/quickscan/ScanRunner";
 
@@ -37,10 +38,11 @@ export default async function QuickscanPage({ params, searchParams }: PageProps)
   if (!scan) notFound();
 
   const sharedAnswers = r ? decodeAnswers(r) : null;
+  const peerScores = await getCategoryAverages(scan.slug);
 
   return (
     <main className="min-h-screen bg-background">
-      <ScanRunner scan={scan} initialAnswers={sharedAnswers} />
+      <ScanRunner scan={scan} initialAnswers={sharedAnswers} peerScores={peerScores} />
     </main>
   );
 }

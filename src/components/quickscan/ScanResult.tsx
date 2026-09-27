@@ -6,6 +6,8 @@ import { formatPercentage, maxPointsForQuestion } from "@/lib/quickscan/scoring"
 import { Modal } from "@/components/Modal";
 import { CalBookingLink } from "@/components/CalBookingLink";
 import { CategoryRadarChart } from "./CategoryRadarChart";
+import { ScoreBadge } from "./ScoreBadge";
+import { ScoreLegend, ScoreThermometerGraphic } from "./ScoreThermometer";
 
 /** Rood (0%) via geel naar groen (100%), zelfde toon/verzadiging voor een consistente gradient. */
 function ratingColor(fraction: number): string {
@@ -17,29 +19,47 @@ interface Props {
   scan: Scan;
   result: ScanResult;
   answers: Answers;
+  /** Gemiddelde score per categoriecode van andere deelnemers van déze scan — voor de peergroup-vergelijking op het spiderweb-diagram. */
+  peerScores?: Record<string, number>;
 }
 
-export function ScanResultView({ scan, result, answers }: Props) {
+export function ScanResultView({ scan, result, answers, peerScores }: Props) {
   const { tier, categories, lowestCategory } = result;
   const lowestCategoryText = scan.categories.find(
     (c) => c.code === lowestCategory.code,
   )?.lowScoreText;
 
   const [zoomed, setZoomed] = useState(false);
+  const hasPeerData =
+    peerScores != null && categories.every((c) => peerScores[c.code] != null);
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16">
       <div className="rounded-2xl border border-border bg-surface p-6 text-center sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
-          Jouw score
-        </p>
-        <p className="mt-2 text-5xl font-bold text-foreground sm:text-6xl">
-          {formatPercentage(result.percentage)}
-        </p>
-        <p className="mt-4 text-xl font-semibold text-appwizer-orange">
-          {tier.level}
-        </p>
-        <p className="mt-1 text-muted-foreground">{tier.headline}</p>
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:text-left">
+          <div className="flex shrink-0 flex-col items-center">
+            <ScoreThermometerGraphic
+              fraction={result.percentage}
+              label="Jouw score"
+              className="h-48 w-auto sm:h-56"
+            />
+            <div className="mt-3">
+              <ScoreLegend />
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
+              Jouw score
+            </p>
+            <p className="mt-2 text-5xl font-bold text-foreground sm:text-6xl">
+              {formatPercentage(result.percentage)}
+            </p>
+            <p className="mt-4 text-xl font-semibold text-appwizer-orange">
+              {tier.level}
+            </p>
+            <p className="mt-1 text-muted-foreground">{tier.headline}</p>
+          </div>
+        </div>
         <CalBookingLink
           label="Boek een intakegesprek"
           className="mt-6 inline-block w-full rounded-lg bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110 sm:w-auto"
@@ -49,12 +69,33 @@ export function ScanResultView({ scan, result, answers }: Props) {
       <h2 className="mt-10 text-xl font-semibold text-foreground sm:mt-14">
         Je score per onderdeel
       </h2>
+      {hasPeerData && (
+        <ul className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm">
+          <li className="flex items-center gap-2">
+            <span aria-hidden="true" className="h-0.5 w-4 shrink-0 rounded-full bg-appwizer-orange" />
+            <span className="text-muted-foreground">Jouw score</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <span
+              aria-hidden="true"
+              className="h-0.5 w-4 shrink-0 rounded-full bg-appwizer-blue"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(90deg, var(--color-appwizer-blue) 0 4px, transparent 4px 7px)",
+                backgroundColor: "transparent",
+              }}
+            />
+            <span className="text-muted-foreground">Gemiddelde van andere deelnemers</span>
+          </li>
+        </ul>
+      )}
       <div className="relative mt-6">
         <CategoryRadarChart
           categories={categories}
           lowestCode={lowestCategory.code}
           onClick={() => setZoomed(true)}
           className="mx-auto w-full max-w-xl"
+          peerScores={peerScores}
           large
         />
         <button
@@ -98,6 +139,7 @@ export function ScanResultView({ scan, result, answers }: Props) {
             categories={categories}
             lowestCode={lowestCategory.code}
             className="mx-auto w-full max-w-none"
+            peerScores={peerScores}
             large
           />
         </Modal>
@@ -118,14 +160,12 @@ export function ScanResultView({ scan, result, answers }: Props) {
                   <span className="sr-only">Toon of verberg de gegeven antwoorden</span>
                   <div className="flex items-center gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between text-sm">
+                      <div className="flex items-center justify-between gap-3 text-sm">
                         <span className="font-medium text-foreground">
                           {categoryIcon && <span className="mr-1.5">{categoryIcon}</span>}
                           {category.name}
                         </span>
-                        <span className="tabular-nums text-muted-foreground">
-                          {formatPercentage(category.percentage)}
-                        </span>
+                        <ScoreBadge fraction={category.percentage} />
                       </div>
                       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
                         <div

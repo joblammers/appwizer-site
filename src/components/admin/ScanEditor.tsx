@@ -11,7 +11,7 @@ import type {
   Tier,
 } from "@/lib/quickscan/types";
 import { validateScan } from "@/lib/quickscan/validate";
-import { deleteScanAction, saveScanAction } from "@/app/admin/actions";
+import { deleteScanAction, saveScanAction } from "@/app/(site)/admin/actions";
 
 interface Props {
   scan: Scan;
@@ -159,6 +159,19 @@ export function ScanEditor({ scan: initialScan }: Props) {
             />
           </Field>
         </div>
+        <label className="mt-4 flex items-center gap-2 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={scan.visible ?? true}
+            onChange={(e) => update("visible", e.target.checked)}
+            className="h-4 w-4 accent-appwizer-orange"
+          />
+          Zichtbaar op de site
+        </label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Verborgen scans staan niet in de scanlijst op de site (bv. de footer),
+          maar blijven direct bereikbaar via hun URL.
+        </p>
         <Field label="Intro" className="mt-4">
           <textarea
             rows={5}
@@ -306,6 +319,29 @@ function IconButton({
   );
 }
 
+function DeleteButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="shrink-0 rounded-lg border border-border p-2 text-muted-foreground hover:border-appwizer-orange hover:text-appwizer-orange"
+    >
+      <svg viewBox="0 0 20 20" aria-hidden="true" className="h-4 w-4">
+        <path
+          d="M7 3h6M4.5 5.5h11M6 5.5v10.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V5.5M8.5 8.5v5M11.5 8.5v5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
 function StringListEditor({
   items,
   onChange,
@@ -329,9 +365,10 @@ function StringListEditor({
               onChange(next);
             }}
           />
-          <IconButton onClick={() => onChange(items.filter((_, i) => i !== index))}>
-            Verwijder
-          </IconButton>
+          <DeleteButton
+            onClick={() => onChange(items.filter((_, i) => i !== index))}
+            label="Verwijder regel"
+          />
         </div>
       ))}
       <IconButton onClick={() => onChange([...items, ""])}>+ Regel toevoegen</IconButton>
@@ -413,9 +450,10 @@ function CategoriesSection({
                   onChange={(e) => updateAt(index, { weight: Number(e.target.value) })}
                 />
               </Field>
-              <IconButton onClick={() => onChange(categories.filter((_, i) => i !== index))}>
-                Verwijder
-              </IconButton>
+              <DeleteButton
+                onClick={() => onChange(categories.filter((_, i) => i !== index))}
+                label="Verwijder categorie"
+              />
             </div>
             <Field label="Tekst bij laagste score" className="mt-3">
               <textarea
@@ -536,22 +574,21 @@ function QuestionsSection({
                   <input
                     type="number"
                     disabled={oIndex === 0}
-                    className={`${inputClass} w-16 shrink-0 tabular-nums disabled:opacity-60`}
+                    className={`${inputClass} basis-16 grow-0 shrink-0 tabular-nums disabled:opacity-60`}
                     value={option.points}
                     onChange={(e) =>
                       updateOptionPoints(qIndex, oIndex, Number(e.target.value))
                     }
                   />
                   <input
-                    className={inputClass}
+                    className={`${inputClass} min-w-0 flex-1`}
                     value={option.label}
                     onChange={(e) => updateOptionLabel(qIndex, oIndex, e.target.value)}
                   />
-                  <IconButton
+                  <DeleteButton
                     onClick={() => removeOption(qIndex, oIndex)}
-                  >
-                    Verwijder
-                  </IconButton>
+                    label="Verwijder antwoord"
+                  />
                 </div>
               ))}
               <IconButton onClick={() => addOption(qIndex)}>+ Antwoord toevoegen</IconButton>

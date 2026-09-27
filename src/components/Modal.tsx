@@ -31,7 +31,7 @@ export function Modal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full rounded-2xl bg-surface p-4 pt-14 sm:p-6 sm:pt-16 ${maxWidthClassName}`}
+        className={`relative max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-surface p-4 pt-14 sm:p-6 sm:pt-16 ${maxWidthClassName}`}
       >
         <button
           type="button"

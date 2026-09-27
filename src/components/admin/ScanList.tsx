@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import type { Scan } from "@/lib/quickscan/types";
-import { createScanAction, deleteScanAction } from "@/app/admin/actions";
+import { createScanAction, deleteScanAction } from "@/app/(site)/admin/actions";
 
 interface Props {
   scans: Scan[];
@@ -61,9 +61,16 @@ function ScanRow({ scan }: { scan: Scan }) {
     <div className="rounded-xl border border-border bg-surface p-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
-            {scan.audience}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
+              {scan.audience}
+            </p>
+            {scan.visible === false && (
+              <span className="rounded-full bg-appwizer-orange/10 px-2 py-0.5 text-xs font-medium text-appwizer-orange">
+                Verborgen
+              </span>
+            )}
+          </div>
           <Link
             href={`/admin/${scan.slug}`}
             className="text-lg font-semibold text-foreground hover:text-appwizer-orange"

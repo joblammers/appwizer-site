@@ -1,54 +1,301 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getScans } from "@/lib/quickscan/scans";
+import { CalBookingLink } from "@/components/CalBookingLink";
+import { QuickscanModalButton } from "@/components/QuickscanModalButton";
+import { getScan } from "@/lib/quickscan/scans";
+import { getCategoryAverages } from "@/lib/quickscan/leads";
 
 export const metadata: Metadata = {
-  title: "Quickscan administratieve processen",
+  title: "AppWizer — Automatisering van administratieve processen",
   description:
-    "Ontdek in zes minuten waar in je administratieve proces tijd en geld weglekken.",
+    "AppWizer analyseert en optimaliseert je administratieve processen in NetSuite, Odoo, Exact Online en Twinfield — en laat exact zien waar tijd en geld weglekt.",
 };
 
-// Niet statisch cachen: scaninhoud kan via /admin wijzigen zonder redeploy.
+// Niet statisch cachen: de quickscan-inhoud in de popup kan via /admin
+// wijzigen zonder redeploy.
 export const dynamic = "force-dynamic";
 
-export default async function QuickscanIndexPage() {
-  const scans = await getScans();
+const TOOLS = ["NetSuite", "Odoo", "Exact Online", "Twinfield", "Simplicate", "Zenvoices"];
+
+const STEPS = [
+  {
+    n: "01",
+    title: "Quickscan & analyse",
+    body: "We brengen je huidige facturatie-, boekhoud- en salarisprocessen in kaart en signaleren knelpunten.",
+  },
+  {
+    n: "02",
+    title: "Rapport & advies",
+    body: "Je ontvangt een concreet rapport met knelpunten, werkinstructies en optimalisatie-alternatieven.",
+  },
+  {
+    n: "03",
+    title: "Implementatie",
+    body: "We richten de automatisering in binnen je bestaande software — geen migratie, wel resultaat.",
+  },
+  {
+    n: "04",
+    title: "Continue optimalisatie",
+    body: "We monitoren de processen en ondersteunen je team, zodat de besparing behouden blijft en verder groeit.",
+  },
+];
+
+const SYSTEMS = [
+  {
+    name: "NetSuite",
+    body: "Geautomatiseerde financiele workflows en factuurverwerking binnen je bestaande NetSuite-omgeving.",
+  },
+  {
+    name: "Odoo",
+    body: "Gekoppelde modules en automatische goedkeuringsflows tussen inkoop, verkoop en boekhouding.",
+  },
+  {
+    name: "Exact Online",
+    body: "Automatische matching en boeking van facturen en bankmutaties.",
+  },
+  {
+    name: "Twinfield",
+    body: "Gestandaardiseerde verwerking van verkoop- en inkoopfacturen met minder handwerk.",
+  },
+  {
+    name: "Simplicate",
+    body: "Koppeling van urenregistratie en facturatie zonder dubbele invoer.",
+  },
+  {
+    name: "Zenvoices",
+    body: "Automatische factuurherkenning direct doorgezet naar je boekhoudpakket.",
+  },
+];
+
+const heading = "font-[family-name:var(--font-space-grotesk)]";
+
+/**
+ * Homepage-body — header en footer zitten in (site)/layout.tsx en gelden
+ * voor elke publieke pagina; dit bestand is alleen de content ertussen
+ * (hero, werkwijze, systemen, slot-cta). Gebruikt de gewone thema-tokens
+ * (bg-background, text-foreground, bg-surface, enz.) zodat licht/donker/
+ * systeem hier ook werkt — de #software-sectie blijft bewust een vaste
+ * donkere accentband (net als een merkfoto: hij hoort niet om te klappen
+ * naar wit, en wit-op-navy is sowieso in beide standen goed leesbaar).
+ * Eigen fonts via next/font (Space Grotesk voor koppen, IBM Plex Sans voor
+ * de rest — zie layout.tsx in de app-root).
+ *
+ * "Doe de Quickscan" opent de scan in een lightbox (QuickscanModalButton) —
+ * zoals de Cal.com-popup, maar dan de ScanRunner zelf in een Modal in plaats
+ * van weg te navigeren naar /mkb. De eindconversie gebruikt CalBookingLink
+ * (het bestaande element-click embed) in plaats van een los data-cal-link-
+ * blok, zodat er geen tweede Cal.com-initialisatie naast die in layout.tsx
+ * nodig is.
+ */
+export default async function HomePage() {
+  const scan = await getScan("mkb");
+  const peerScores = scan ? await getCategoryAverages(scan.slug) : {};
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-20">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Doe de quickscan
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Twee scans, elk zes minuten. Kies de scan die bij jouw situatie past —
-          je krijgt direct je score per onderdeel en een verbeterrapport in je
-          mailbox.
-        </p>
+    <div
+      className="bg-background text-foreground"
+      style={{ fontFamily: "var(--font-ibm-plex-sans), Arial, sans-serif" }}
+    >
+      <div
+        className="mx-auto grid max-w-[1200px] items-center gap-[60px] px-6 pt-8 pb-20 sm:pt-12"
+        style={{ gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))" }}
+      >
+        <div>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-appwizer-blue/10 px-3.5 py-1.75 text-[13px] font-semibold text-appwizer-blue">
+            Voor finance &amp; controllers in het MKB
+          </div>
+          <h1
+            className={`m-0 mb-[22px] text-[clamp(32px,5vw,52px)] leading-[1.12] font-bold tracking-[-0.02em] ${heading}`}
+          >
+            Wij optimaliseren herhalende taken door ze zoveel mogelijk te automatiseren.
+          </h1>
+          <p className="m-0 mb-[34px] max-w-[520px] text-lg leading-[1.6] text-muted-foreground">
+            AppWizer analyseert en optimaliseert je administratieve processen in NetSuite,
+            Odoo, Exact Online, Twinfield — en laat exact zien waar tijd en geld weglekt.
+          </p>
+          <div className="flex flex-wrap items-center gap-4">
+            {scan ? (
+              <QuickscanModalButton
+                scan={scan}
+                label="Doe de Quickscan"
+                peerScores={peerScores}
+                className="rounded-xl bg-appwizer-orange px-7 py-3.75 text-base font-semibold text-white shadow-[0_10px_24px_-8px_rgba(223,125,60,0.45)] transition hover:brightness-110"
+              />
+            ) : (
+              <Link
+                href="/mkb"
+                className="rounded-xl bg-appwizer-orange px-7 py-3.75 text-base font-semibold text-white no-underline shadow-[0_10px_24px_-8px_rgba(223,125,60,0.45)]"
+              >
+                Doe de Quickscan
+              </Link>
+            )}
+          </div>
+        </div>
 
-        <div className="mt-10 grid gap-6 sm:mt-12 sm:grid-cols-2">
-          {scans.map((scan) => (
-            <Link
-              key={scan.slug}
-              href={`/${scan.slug}`}
-              className="group rounded-xl border border-border bg-surface p-6 transition hover:border-appwizer-orange sm:p-8"
+        <div className="relative min-h-[340px]">
+          <div className="absolute inset-0 flex items-center justify-center gap-[clamp(20px,4vw,44px)] rounded-3xl bg-surface p-[clamp(24px,4vw,40px)]">
+            <svg
+              viewBox="0 0 150 300"
+              className="h-[min(280px,100%)] w-auto flex-none"
+              aria-label="Administratie Optimalisatiegraad 45 procent"
             >
-              <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
-                {scan.audience}
-              </p>
-              <h2 className="mt-3 text-xl font-semibold text-foreground">
-                {scan.title}
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {scan.subtitle}
-              </p>
-              <span className="mt-6 inline-block text-sm font-semibold text-appwizer-orange">
-                Start de scan →
+              <rect x={112} y={42} width={30} height={11} rx={5.5} className="fill-border" />
+              <rect x={112} y={76} width={30} height={11} rx={5.5} className="fill-border" />
+              <rect x={112} y={110} width={30} height={11} rx={5.5} className="fill-border" />
+              <rect x={112} y={178} width={30} height={11} rx={5.5} className="fill-border" />
+              <rect x={112} y={144} width={30} height={11} rx={5.5} fill="#F07A1A" />
+              <path
+                d="M52 30 h22 a14 14 0 0 1 14 14 v148 a14 14 0 0 1 -14 14 h-22 a14 14 0 0 1 -14 -14 v-148 a14 14 0 0 1 14 -14 z"
+                className="fill-surface stroke-foreground"
+                strokeWidth={11}
+              />
+              <circle
+                cx={63}
+                cy={232}
+                r={46}
+                className="fill-surface stroke-foreground"
+                strokeWidth={11}
+              />
+              <rect x={57} y={146} width={12} height={68} fill="#F07A1A" />
+              <circle cx={63} cy={232} r={33} fill="#F07A1A" />
+              <text
+                x={63}
+                y={243}
+                textAnchor="middle"
+                fontFamily="var(--font-space-grotesk), sans-serif"
+                fontSize={27}
+                fontWeight={700}
+                fill="#fff"
+              >
+                45%
+              </text>
+            </svg>
+            <div className="min-w-0">
+              <div className="mb-2 text-xs font-bold tracking-[0.04em] text-muted-foreground">
+                QUICKSCAN RESULTAAT
+              </div>
+              <div
+                className={`text-[clamp(24px,3.2vw,32px)] leading-[1.1] font-bold text-foreground ${heading}`}
+              >
+                12 uur / maand
+              </div>
+              <div className="mt-1.5 text-[13.5px] text-muted-foreground">
+                bespaard op factuurverwerking
+              </div>
+              <div className={`mt-[22px] text-[22px] font-bold text-foreground ${heading}`}>
+                € 2.936 / jaar
+              </div>
+              <div className="mt-1 text-xs font-semibold text-muted-foreground">
+                geschatte besparing
+              </div>
+              <div className="mt-[22px] text-[13px] font-bold text-appwizer-orange">
+                Jouw Administratie Optimalisatiegraad
+              </div>
+              <div className="mt-2.5 flex flex-wrap gap-3.5">
+                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
+                  <span className="h-[11px] w-[11px] rounded-full bg-[#CE2233]" />
+                  Laag
+                </span>
+                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
+                  <span className="h-[11px] w-[11px] rounded-full bg-[#F07A1A]" />
+                  Medium
+                </span>
+                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
+                  <span className="h-[11px] w-[11px] rounded-full bg-[#4CB949]" />
+                  Hoog
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-b border-border bg-surface">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-5 px-6 py-7">
+          <span className="text-[13px] font-semibold tracking-[0.02em] text-muted-foreground">
+            WIJ OPTIMALISEREN PROCESSEN IN
+          </span>
+          <div className="flex flex-wrap items-center gap-8">
+            {TOOLS.map((tool) => (
+              <span key={tool} className={`text-base font-semibold text-foreground ${heading}`}>
+                {tool}
               </span>
-            </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div id="werkwijze" className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)]">
+        <div className="mx-auto mb-14 max-w-[600px] text-center">
+          <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-appwizer-orange">
+            ONZE WERKWIJZE
+          </div>
+          <h2 className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
+            Van knelpunt naar automatisering in vier stappen
+          </h2>
+        </div>
+        <div
+          className="grid gap-6"
+          style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))" }}
+        >
+          {STEPS.map((step) => (
+            <div key={step.n} className="rounded-[18px] border border-border bg-surface p-8">
+              <div className={`mb-[18px] text-sm font-bold text-appwizer-blue/50 ${heading}`}>
+                {step.n}
+              </div>
+              <h3 className="m-0 mb-2.5 text-[19px] font-semibold">{step.title}</h3>
+              <p className="m-0 text-[15px] leading-[1.6] text-muted-foreground">{step.body}</p>
+            </div>
           ))}
         </div>
-      </section>
-    </main>
+      </div>
+
+      <div id="software" className="bg-[#16324A] px-6 py-[clamp(56px,10vw,100px)]">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="mx-auto mb-14 max-w-[600px] text-center">
+            <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-[#F3C6A2]">
+              PER SYSTEEM
+            </div>
+            <h2
+              className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] text-white ${heading}`}
+            >
+              Procesoptimalisatie binnen jouw software
+            </h2>
+            <p className="mt-3.5 text-base text-[#B7CBDD]">
+              We werken met de tools die je al gebruikt — geen migratie nodig.
+            </p>
+          </div>
+          <div
+            className="grid gap-5"
+            style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))" }}
+          >
+            {SYSTEMS.map((system) => (
+              <div
+                key={system.name}
+                className="rounded-2xl border border-white/[0.12] bg-white/[0.07] p-[26px]"
+              >
+                <h3 className={`m-0 mb-2 text-lg font-semibold text-white ${heading}`}>
+                  {system.name}
+                </h3>
+                <p className="m-0 text-[14.5px] leading-[1.6] text-[#B7CBDD]">{system.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">
+        <h2 className={`m-0 mb-[18px] text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.02em] ${heading}`}>
+          Wil je weten wat automatisering jou oplevert?
+        </h2>
+        <p className="mx-auto mb-8 max-w-[520px] text-[17px] text-muted-foreground">
+          Boek een intakegesprek en ontvang een indicatie van je tijd- en kostenbesparing.
+        </p>
+        <CalBookingLink
+          label="Boek een intakegesprek"
+          className="inline-block rounded-xl bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110"
+        />
+      </div>
+    </div>
   );
 }
