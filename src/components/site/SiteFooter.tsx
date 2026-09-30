@@ -60,7 +60,7 @@ export function SiteFooter({ scans }: { scans: Scan[] }) {
                     <li key={scan.slug}>
                       <QuickscanModalButton
                         scan={scan}
-                        label={scan.title}
+                        label={scan.audience}
                         className="text-left text-[13px] text-muted-foreground hover:text-appwizer-orange"
                       />
                     </li>

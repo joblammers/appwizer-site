@@ -66,15 +66,21 @@ export function ScoreThermometerGraphic({
 
       <path d={TUBE_PATH_OPEN} className="fill-surface" />
 
-      <rect
-        x={60 - STEM_HALF_WIDTH}
-        y={stemTop}
-        width={STEM_HALF_WIDTH * 2}
-        height={BULB_CENTER_Y - stemTop + BULB_RADIUS}
-        rx={STEM_HALF_WIDTH}
-        fill={color}
-        clipPath={`url(#${clipId})`}
-      />
+      {/* Kwik "rijst" bij het laden naar het echte percentage (@starting-style,
+          zie .thermometer-fill in globals.css) — de buisvorm-clip zit op de
+          <g>, de rijs-animatie op de <rect> zelf, want één element kan maar
+          één clip-path hebben en deze twee moeten allebei gelden. */}
+      <g clipPath={`url(#${clipId})`}>
+        <rect
+          x={60 - STEM_HALF_WIDTH}
+          y={stemTop}
+          width={STEM_HALF_WIDTH * 2}
+          height={BULB_CENTER_Y - stemTop + BULB_RADIUS}
+          rx={STEM_HALF_WIDTH}
+          fill={color}
+          className="thermometer-fill"
+        />
+      </g>
 
       <path
         d={TUBE_PATH_OPEN}
@@ -96,7 +102,7 @@ export function ScoreThermometerGraphic({
         x={60}
         y={BULB_CENTER_Y + 8}
         textAnchor="middle"
-        className="fill-white text-2xl font-bold"
+        className="thermometer-value fill-white text-2xl font-bold"
       >
         {formatPercentage(fraction)}
       </text>

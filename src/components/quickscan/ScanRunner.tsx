@@ -175,7 +175,7 @@ export function ScanRunner({ scan, initialAnswers, peerScores }: Props) {
     if (scan.introImage) {
       return (
         <section className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-          <div className="flex flex-col gap-8 text-center sm:flex-row sm:items-center sm:text-left">
+          <div className="flex flex-col gap-8 text-center sm:flex-row sm:items-start sm:text-left">
             <img
               src={scan.introImage}
               alt=""

@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalBookingLink } from "@/components/CalBookingLink";
 import { QuickscanModalButton } from "@/components/QuickscanModalButton";
-import { getScan } from "@/lib/quickscan/scans";
+import { QuickscanDropdown } from "@/components/site/QuickscanDropdown";
+import { HeroThermometerDemo } from "@/components/site/HeroThermometerDemo";
+import { SystemsGrid } from "@/components/site/SystemsGrid";
+import { WorkflowSteps } from "@/components/site/WorkflowSteps";
+import { getScan, getScans } from "@/lib/quickscan/scans";
 import { getCategoryAverages } from "@/lib/quickscan/leads";
+import { getAllCases } from "@/lib/cases";
 
 export const metadata: Metadata = {
   title: "AppWizer — Automatisering van administratieve processen",
@@ -82,14 +86,16 @@ const heading = "font-[family-name:var(--font-space-grotesk)]";
  *
  * "Doe de Quickscan" opent de scan in een lightbox (QuickscanModalButton) —
  * zoals de Cal.com-popup, maar dan de ScanRunner zelf in een Modal in plaats
- * van weg te navigeren naar /mkb. De eindconversie gebruikt CalBookingLink
- * (het bestaande element-click embed) in plaats van een los data-cal-link-
- * blok, zodat er geen tweede Cal.com-initialisatie naast die in layout.tsx
- * nodig is.
+ * van weg te navigeren naar /mkb. De eindconversie is QuickscanDropdown: een
+ * knop met keuzemenu (alle zichtbare scans), die de gekozen scan in diezelfde
+ * soort lightbox opent — vervangt de eerdere Cal.com-boekingsknop hier.
  */
 export default async function HomePage() {
   const scan = await getScan("mkb");
   const peerScores = scan ? await getCategoryAverages(scan.slug) : {};
+  const cases = await getAllCases();
+  const allScans = await getScans();
+  const visibleScans = allScans.filter((s) => s.visible !== false);
 
   return (
     <div
@@ -132,82 +138,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="relative min-h-[340px]">
-          <div className="absolute inset-0 flex items-center justify-center gap-[clamp(20px,4vw,44px)] rounded-3xl bg-surface p-[clamp(24px,4vw,40px)]">
-            <svg
-              viewBox="0 0 150 300"
-              className="h-[min(280px,100%)] w-auto flex-none"
-              aria-label="Administratie Optimalisatiegraad 45 procent"
-            >
-              <rect x={112} y={42} width={30} height={11} rx={5.5} className="fill-border" />
-              <rect x={112} y={76} width={30} height={11} rx={5.5} className="fill-border" />
-              <rect x={112} y={110} width={30} height={11} rx={5.5} className="fill-border" />
-              <rect x={112} y={178} width={30} height={11} rx={5.5} className="fill-border" />
-              <rect x={112} y={144} width={30} height={11} rx={5.5} fill="#F07A1A" />
-              <path
-                d="M52 30 h22 a14 14 0 0 1 14 14 v148 a14 14 0 0 1 -14 14 h-22 a14 14 0 0 1 -14 -14 v-148 a14 14 0 0 1 14 -14 z"
-                className="fill-surface stroke-foreground"
-                strokeWidth={11}
-              />
-              <circle
-                cx={63}
-                cy={232}
-                r={46}
-                className="fill-surface stroke-foreground"
-                strokeWidth={11}
-              />
-              <rect x={57} y={146} width={12} height={68} fill="#F07A1A" />
-              <circle cx={63} cy={232} r={33} fill="#F07A1A" />
-              <text
-                x={63}
-                y={243}
-                textAnchor="middle"
-                fontFamily="var(--font-space-grotesk), sans-serif"
-                fontSize={27}
-                fontWeight={700}
-                fill="#fff"
-              >
-                45%
-              </text>
-            </svg>
-            <div className="min-w-0">
-              <div className="mb-2 text-xs font-bold tracking-[0.04em] text-muted-foreground">
-                QUICKSCAN RESULTAAT
-              </div>
-              <div
-                className={`text-[clamp(24px,3.2vw,32px)] leading-[1.1] font-bold text-foreground ${heading}`}
-              >
-                12 uur / maand
-              </div>
-              <div className="mt-1.5 text-[13.5px] text-muted-foreground">
-                bespaard op factuurverwerking
-              </div>
-              <div className={`mt-[22px] text-[22px] font-bold text-foreground ${heading}`}>
-                € 2.936 / jaar
-              </div>
-              <div className="mt-1 text-xs font-semibold text-muted-foreground">
-                geschatte besparing
-              </div>
-              <div className="mt-[22px] text-[13px] font-bold text-appwizer-orange">
-                Jouw Administratie Optimalisatiegraad
-              </div>
-              <div className="mt-2.5 flex flex-wrap gap-3.5">
-                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-                  <span className="h-[11px] w-[11px] rounded-full bg-[#CE2233]" />
-                  Laag
-                </span>
-                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-                  <span className="h-[11px] w-[11px] rounded-full bg-[#F07A1A]" />
-                  Medium
-                </span>
-                <span className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-                  <span className="h-[11px] w-[11px] rounded-full bg-[#4CB949]" />
-                  Hoog
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <HeroThermometerDemo />
       </div>
 
       <div className="border-t border-b border-border bg-surface">
@@ -234,20 +165,7 @@ export default async function HomePage() {
             Van knelpunt naar automatisering in vier stappen
           </h2>
         </div>
-        <div
-          className="grid gap-6"
-          style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))" }}
-        >
-          {STEPS.map((step) => (
-            <div key={step.n} className="rounded-[18px] border border-border bg-surface p-8">
-              <div className={`mb-[18px] text-sm font-bold text-appwizer-blue/50 ${heading}`}>
-                {step.n}
-              </div>
-              <h3 className="m-0 mb-2.5 text-[19px] font-semibold">{step.title}</h3>
-              <p className="m-0 text-[15px] leading-[1.6] text-muted-foreground">{step.body}</p>
-            </div>
-          ))}
-        </div>
+        <WorkflowSteps steps={STEPS} />
       </div>
 
       <div id="software" className="bg-[#16324A] px-6 py-[clamp(56px,10vw,100px)]">
@@ -265,22 +183,7 @@ export default async function HomePage() {
               We werken met de tools die je al gebruikt — geen migratie nodig.
             </p>
           </div>
-          <div
-            className="grid gap-5"
-            style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))" }}
-          >
-            {SYSTEMS.map((system) => (
-              <div
-                key={system.name}
-                className="rounded-2xl border border-white/[0.12] bg-white/[0.07] p-[26px]"
-              >
-                <h3 className={`m-0 mb-2 text-lg font-semibold text-white ${heading}`}>
-                  {system.name}
-                </h3>
-                <p className="m-0 text-[14.5px] leading-[1.6] text-[#B7CBDD]">{system.body}</p>
-              </div>
-            ))}
-          </div>
+          <SystemsGrid systems={SYSTEMS} cases={cases} />
         </div>
       </div>
 
@@ -289,11 +192,13 @@ export default async function HomePage() {
           Wil je weten wat automatisering jou oplevert?
         </h2>
         <p className="mx-auto mb-8 max-w-[520px] text-[17px] text-muted-foreground">
-          Boek een intakegesprek en ontvang een indicatie van je tijd- en kostenbesparing.
+          Doe de gratis quickscan en ontvang direct een indicatie van je tijd- en
+          kostenbesparing.
         </p>
-        <CalBookingLink
-          label="Boek een intakegesprek"
-          className="inline-block rounded-xl bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110"
+        <QuickscanDropdown
+          scans={visibleScans}
+          label="Doe de Quickcheck"
+          className="inline-flex items-center rounded-xl bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110"
         />
       </div>
     </div>

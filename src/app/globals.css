@@ -47,3 +47,175 @@ body {
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Strong custom easings — built-in CSS easings are too weak for deliberate UI motion. */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/*
+ * "Per systeem"-kaarten (SystemsGrid.tsx): gestaggerde scroll-reveal +
+ * hover-lift. Beide staan hier (niet als inline transform-style) omdat een
+ * inline transform altijd wint van een :hover-regel uit het stylesheet —
+ * daarmee zou de hover-lift na de reveal domweg niets doen.
+ */
+.system-card {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 300ms var(--ease-out),
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+
+.system-card[data-inview] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .system-card[data-inview]:hover {
+    transform: translateY(-4px);
+    border-color: rgb(255 255 255 / 0.25);
+    background-color: rgb(255 255 255 / 0.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-card {
+    transition: opacity 150ms ease !important;
+    transform: none !important;
+  }
+}
+
+/*
+ * Werkwijze-stappen + pijlen (WorkflowSteps.tsx). Elke kaart draagt zijn
+ * eigen staggerdelay als CSS-variabele (--reveal-delay, geërfd), zodat het
+ * stapnummer erin (.reveal-step-number) zijn eigen, iets latere delay kan
+ * berekenen zonder dat React 'm apart hoeft door te geven — de kaart komt
+ * op, dán "popt" het nummer, in plaats van alles in exact dezelfde beweging.
+ */
+.reveal-step {
+  --reveal-delay: 0ms;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition:
+    opacity 350ms var(--ease-out),
+    transform 350ms var(--ease-out);
+  transition-delay: var(--reveal-delay);
+}
+
+.reveal-step[data-inview] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.reveal-step-number {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 300ms var(--ease-out);
+  transition-delay: calc(var(--reveal-delay) + 150ms);
+}
+
+.reveal-step[data-inview] .reveal-step-number {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-step,
+  .reveal-step-number {
+    transition: opacity 150ms ease !important;
+    transform: none !important;
+  }
+}
+
+/*
+ * Horizontale pijl (desktop) "vloeit" continu naar rechts — een zachte,
+ * herhalende nudge (geen bounce) die de procesrichting benadrukt. Alleen de
+ * horizontale variant (de verticale, gestapelde pijl blijft stil): "naar
+ * rechts vloeien" heeft geen zinvolle verticale tegenhanger hier.
+ */
+@keyframes arrow-flow-right {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 1;
+  }
+}
+
+.arrow-flow-right {
+  animation: arrow-flow-right 1.4s var(--ease-in-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow-flow-right {
+    animation: none;
+  }
+}
+
+/*
+ * Thermometer-vulling (ScoreThermometer.tsx): het kwik "rijst" naar het
+ * echte percentage zodra het element in de DOM verschijnt (@starting-style —
+ * geen JS/state nodig, dus dit bestand hoeft geen "use client" te zijn; zou
+ * dat wel moeten, dan kan ScoreBadge.tsx — een Server Component — TONE_COLORS
+ * er niet meer uit importeren, zie het commentaar bij die export). De
+ * buisvorm-clip zit apart op de omhullende <g> in de component zelf.
+ */
+.thermometer-fill {
+  clip-path: inset(0% 0 0 0);
+  transition: clip-path 700ms var(--ease-out);
+
+  @starting-style {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+.thermometer-value {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 250ms var(--ease-out),
+    transform 250ms var(--ease-out);
+  transition-delay: 450ms;
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thermometer-fill {
+    transition: none !important;
+  }
+  .thermometer-value {
+    transition: opacity 150ms ease !important;
+    transform: none !important;
+  }
+}
+
+/* Hero-mockup op de homepage: het kwik verschuift (y/height) bij het hoveren naar een andere voorbeeldwaarde — moving on-screen, dus ease-in-out, iets langer dan een UI-duration omdat dit marketing/explanatory is. */
+.hero-thermometer-fill {
+  transition:
+    y 450ms var(--ease-in-out),
+    height 450ms var(--ease-in-out),
+    fill 300ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-thermometer-fill {
+    transition: fill 150ms ease !important;
+  }
+}
