@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import type { KvTenantRecord, KvTenantStatus } from "@/lib/mcp-kv-tenants";
 import {
@@ -7,6 +8,12 @@ import {
   deleteMcpTenantAction,
   suspendMcpTenantAction,
 } from "@/app/(site)/admin/mcp-actions";
+
+/** Zelfde icoonbestanden als /mcp en de systemen-grid op de homepage. */
+const SYSTEM_ICON: Record<string, string> = {
+  "Exact Online": "/img/exact-online-icon.png",
+  Twinfield: "/img/twinfield-icon.png",
+};
 
 const STATUS: Record<KvTenantStatus, { label: string; className: string }> = {
   pending: {
@@ -32,8 +39,28 @@ const STATUS: Record<KvTenantStatus, { label: string; className: string }> = {
  * src/lib/mcp-kv-tenants.ts.
  */
 export function McpTenantList({ tenants }: { tenants: KvTenantRecord[] }) {
+  const router = useRouter();
+  const [isRefreshing, startRefresh] = useTransition();
+
+  function refresh() {
+    startRefresh(() => {
+      router.refresh();
+    });
+  }
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={refresh}
+          disabled={isRefreshing}
+          className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-appwizer-orange disabled:opacity-60"
+        >
+          {isRefreshing ? "Vernieuwen…" : "Vernieuwen"}
+        </button>
+      </div>
+
       {tenants.map((tenant) => (
         <TenantRow key={tenant.slug} tenant={tenant} />
       ))}
@@ -50,6 +77,7 @@ export function McpTenantList({ tenants }: { tenants: KvTenantRecord[] }) {
 function TenantRow({ tenant }: { tenant: KvTenantRecord }) {
   const [isPending, startTransition] = useTransition();
   const status = STATUS[tenant.status];
+  const primarySystem = tenant.exact ? "Exact Online" : tenant.twinfield ? "Twinfield" : null;
   const systems = [
     tenant.exact && `Exact Online (${new URL(tenant.exact.baseUrl).host})`,
     tenant.twinfield && `Twinfield (${new URL(tenant.twinfield.baseUrl).host})`,
@@ -81,7 +109,13 @@ function TenantRow({ tenant }: { tenant: KvTenantRecord }) {
           <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}>
             {status.label}
           </span>
-          <p className="mt-1 text-lg font-semibold text-foreground">{tenant.name}</p>
+          <div className="mt-1 flex items-center gap-2">
+            {primarySystem && (
+              // eslint-disable-next-line @next/next/no-img-element -- vast icoonbestand, geen externe bron
+              <img src={SYSTEM_ICON[primarySystem]} alt="" className="h-6 w-6 shrink-0" />
+            )}
+            <p className="text-lg font-semibold text-foreground">{tenant.name}</p>
+          </div>
           <p className="text-sm text-muted-foreground">
             {tenant.contactEmail || "Geen e-mailadres"} · /{tenant.slug}
           </p>
