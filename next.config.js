@@ -1,5 +1,3 @@
-import type { NextConfig } from "next";
-
 /**
  * Herkomst van de bestaande WordPress-site.
  *
@@ -12,7 +10,7 @@ const WP_ORIGIN = process.env.WORDPRESS_ORIGIN;
 
 const isProduction = process.env.VERCEL_ENV === "production";
 
-const config: NextConfig = {
+const config = {
   async rewrites() {
     if (!WP_ORIGIN) return [];
 
