@@ -1,5 +1,3 @@
-import type { NextConfig } from "next";
-
 /**
  * Herkomst van de bestaande WordPress-site.
  *
@@ -21,7 +19,7 @@ const TWINFIELD_MCP_URL = process.env.TWINFIELD_MCP_URL;
 
 const isProduction = process.env.VERCEL_ENV === "production";
 
-const config: NextConfig = {
+const config = {
   async rewrites() {
     const beforeFiles: { source: string; destination: string; has?: { type: "host"; value: string }[] }[] = [];
 
