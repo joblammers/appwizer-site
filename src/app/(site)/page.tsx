@@ -3,6 +3,7 @@ import Link from "next/link";
 import { QuickscanModalButton } from "@/components/QuickscanModalButton";
 import { QuickscanDropdown } from "@/components/site/QuickscanDropdown";
 import { HeroThermometerDemo } from "@/components/site/HeroThermometerDemo";
+import { AiProjectsGrid } from "@/components/site/AiProjectsGrid";
 import { SystemsGrid } from "@/components/site/SystemsGrid";
 import { WorkflowSteps } from "@/components/site/WorkflowSteps";
 import { getScan, getScans } from "@/lib/quickscan/scans";
@@ -40,7 +41,21 @@ const STEPS = [
   {
     n: "04",
     title: "Continue optimalisatie",
-    body: "We monitoren de processen en ondersteunen je team, zodat de besparing behouden blijft en verder groeit.",
+    body: "We gebruiken AI om slim te automatiseren, en dat stopt niet na de livegang.",
+    bullets: [
+      {
+        label: "Slimmer",
+        text: "lost uitzonderingen zelf op.",
+      },
+      {
+        label: "Leert mee",
+        text: "handelt steeds meer zelfstandig af.",
+      },
+      {
+        label: "Breidt uit",
+        text: "stap voor stap naar nieuwe processen.",
+      },
+    ],
   },
 ];
 
@@ -93,7 +108,9 @@ const heading = "font-[family-name:var(--font-space-grotesk)]";
 export default async function HomePage() {
   const scan = await getScan("mkb");
   const peerScores = scan ? await getCategoryAverages(scan.slug) : {};
-  const cases = await getAllCases();
+  const allCases = await getAllCases();
+  const cases = allCases.filter((c) => c.category !== "ai");
+  const aiProjects = allCases.filter((c) => c.category === "ai");
   const allScans = await getScans();
   const visibleScans = allScans.filter((s) => s.visible !== false);
 
@@ -185,6 +202,21 @@ export default async function HomePage() {
           </div>
           <SystemsGrid systems={SYSTEMS} cases={cases} />
         </div>
+      </div>
+
+      <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)]">
+        <div className="mx-auto mb-14 max-w-[600px] text-center">
+          <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-appwizer-orange">
+            AI-PROJECTEN
+          </div>
+          <h2 className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
+            Praktijkvoorbeelden van AI-optimalisatie
+          </h2>
+          <p className="mt-3.5 text-base text-muted-foreground">
+            Een greep uit de automatiseringsprojecten die we voor klanten hebben gebouwd.
+          </p>
+        </div>
+        <AiProjectsGrid projects={aiProjects} />
       </div>
 
       <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">

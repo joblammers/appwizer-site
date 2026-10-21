@@ -106,10 +106,10 @@ export function SiteFooter({ scans }: { scans: Scan[] }) {
             <li className="pt-1.5">KVK: 80625614</li>
             <li className="pt-1.5">
               <a
-                href="mailto:info@appwizer.com"
+                href="mailto:support@appwizer.com"
                 className="text-muted-foreground no-underline hover:text-appwizer-orange"
               >
-                info@appwizer.com
+                support@appwizer.com
               </a>
             </li>
           </ul>

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, Clock, Database, Receipt, ScanLine } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { siOdoo } from "simple-icons";
 import { Modal } from "@/components/Modal";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
@@ -16,11 +14,10 @@ interface System {
 /**
  * Odoo heeft een geverifieerd, correct merklogo via simple-icons (MIT-
  * licensed, precies gemaakt voor dit "wij werken met X"-gebruik — enkel pad,
- * dus vanzelf monotoon via currentColor). Oracle NetSuite, Exact, Simplicate
- * en Twinfield (Wolters Kluwer) staan niet in die library — geen
- * betrouwbare bron om hun echte merklogo te verifiëren, dus die houden
- * voorlopig een generiek, functioneel passend icoon totdat er echte
- * logobestanden zijn aangeleverd.
+ * dus vanzelf monotoon via currentColor). Alle andere systemen hebben
+ * door Job aangeleverde echte icoonbestanden (public/*-icon.png) — vast
+ * gedimd (opacity-70) in plaats van monotoon, want het zijn rasterplaatjes
+ * met eigen kleuren, geen SVG-pad dat currentColor kan overnemen.
  */
 function SystemIcon({ name, className }: { name: string; className?: string }) {
   if (name === "Odoo") {
@@ -30,16 +27,20 @@ function SystemIcon({ name, className }: { name: string; className?: string }) {
       </svg>
     );
   }
-  const Icon = GENERIC_ICONS[name];
-  return Icon ? <Icon aria-hidden="true" className={className} /> : null;
+  const imageIcon = IMAGE_ICONS[name];
+  if (!imageIcon) return null;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- vast icoonbestand, geen externe bron
+    <img src={imageIcon} alt="" className={`${className ?? ""} opacity-70`} />
+  );
 }
 
-const GENERIC_ICONS: Record<string, LucideIcon> = {
-  NetSuite: Database,
-  "Exact Online": Calculator,
-  Twinfield: Receipt,
-  Simplicate: Clock,
-  Zenvoices: ScanLine,
+const IMAGE_ICONS: Record<string, string> = {
+  Zenvoices: "/zenvoices-icon.png",
+  Simplicate: "/simplicate-icon.png",
+  NetSuite: "/netsuite-icon.png",
+  Twinfield: "/twinfield-icon.png",
+  "Exact Online": "/exact-online-icon.png",
 };
 
 /** Cases die een systeemnaam noemen — contains-check (case-insensitive): het cv zegt "Oracle NetSuite", de kaart heet "NetSuite". */

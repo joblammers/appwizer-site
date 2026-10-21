@@ -8,6 +8,7 @@ interface Step {
   n: string;
   title: string;
   body: string;
+  bullets?: { label: string; text: string }[];
 }
 
 const STAGGER_MS = 45;
@@ -47,6 +48,21 @@ export function WorkflowSteps({ steps }: { steps: Step[] }) {
             </span>
             <h3 className="m-0 mb-2.5 max-w-[85%] text-[19px] font-semibold">{step.title}</h3>
             <p className="m-0 text-[15px] leading-[1.6] text-muted-foreground">{step.body}</p>
+            {step.bullets && (
+              <ul className="m-0 mt-2.5 space-y-1 text-[15px] leading-[1.6] text-muted-foreground">
+                {step.bullets.map((bullet) => (
+                  <li key={bullet.label} className="flex gap-2">
+                    <span className="text-appwizer-orange" aria-hidden="true">
+                      •
+                    </span>
+                    <span>
+                      <span className="font-semibold text-foreground">{bullet.label}:</span>{" "}
+                      {bullet.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {i < steps.length - 1 && (

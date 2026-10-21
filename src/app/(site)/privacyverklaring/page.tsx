@@ -21,10 +21,10 @@ export default function PrivacyverklaringPage() {
               Deze quickscan is een dienst van appwizer.com. Voor vragen over deze
               verklaring of over je gegevens kun je mailen naar{" "}
               <a
-                href="mailto:info@appwizer.com"
+                href="mailto:support@appwizer.com"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                info@appwizer.com
+                support@appwizer.com
               </a>
               .
             </p>
@@ -69,10 +69,10 @@ export default function PrivacyverklaringPage() {
               pas toegevoegd als je de scan afrondt. Je kunt op elk moment vragen om je
               gegevens te laten verwijderen via{" "}
               <a
-                href="mailto:info@appwizer.com"
+                href="mailto:support@appwizer.com"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                info@appwizer.com
+                support@appwizer.com
               </a>
               .
             </p>
@@ -102,10 +102,10 @@ export default function PrivacyverklaringPage() {
               Je hebt het recht om je gegevens in te zien, te laten corrigeren of te laten
               verwijderen. Neem daarvoor contact op via{" "}
               <a
-                href="mailto:info@appwizer.com"
+                href="mailto:support@appwizer.com"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                info@appwizer.com
+                support@appwizer.com
               </a>
               .
             </p>

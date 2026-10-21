@@ -22,10 +22,10 @@ export default function AlgemeneVoorwaardenPage() {
               Deze voorwaarden gelden voor het gebruik van appwizer.com en de quickscan, een
               dienst van AppWizer B.V. Voor vragen kun je mailen naar{" "}
               <a
-                href="mailto:info@appwizer.com"
+                href="mailto:support@appwizer.com"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                info@appwizer.com
+                support@appwizer.com
               </a>
               .
             </p>
