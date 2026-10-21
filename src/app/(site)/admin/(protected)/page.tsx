@@ -2,19 +2,22 @@ import { isDatabaseConfigured } from "@/lib/db";
 import { getScans } from "@/lib/quickscan/scans";
 import { getAllLeadRows, getLeadStatsByScan } from "@/lib/quickscan/leads";
 import { getAllCases } from "@/lib/cases";
+import { listKvTenants } from "@/lib/mcp-kv-tenants";
 import { ScanList } from "@/components/admin/ScanList";
 import { LeadOverview } from "@/components/admin/LeadOverview";
 import { CaseList } from "@/components/admin/CaseList";
+import { McpTenantList } from "@/components/admin/McpTenantList";
 import { AdminTabs } from "@/components/admin/AdminTabs";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHomePage() {
-  const [scans, leadStats, leadRows, cases] = await Promise.all([
+  const [scans, leadStats, leadRows, cases, mcpTenants] = await Promise.all([
     getScans(),
     getLeadStatsByScan(),
     getAllLeadRows(),
     getAllCases(),
+    listKvTenants(),
   ]);
 
   return (
@@ -35,6 +38,7 @@ export default async function AdminHomePage() {
           resultsPanel={<LeadOverview scans={scans} stats={leadStats} leads={leadRows} />}
           scansPanel={<ScanList scans={scans} />}
           casesPanel={<CaseList cases={cases} />}
+          mcpPanel={<McpTenantList tenants={mcpTenants} />}
         />
       </div>
     </div>

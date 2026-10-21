@@ -36,11 +36,11 @@ function SystemIcon({ name, className }: { name: string; className?: string }) {
 }
 
 const IMAGE_ICONS: Record<string, string> = {
-  Zenvoices: "/zenvoices-icon.png",
-  Simplicate: "/simplicate-icon.png",
-  NetSuite: "/netsuite-icon.png",
-  Twinfield: "/twinfield-icon.png",
-  "Exact Online": "/exact-online-icon.png",
+  Zenvoices: "/img/zenvoices-icon.png",
+  Simplicate: "/img/simplicate-icon.png",
+  NetSuite: "/img/netsuite-icon.png",
+  Twinfield: "/img/twinfield-icon.png",
+  "Exact Online": "/img/exact-online-icon.png",
 };
 
 /** Cases die een systeemnaam noemen — contains-check (case-insensitive): het cv zegt "Oracle NetSuite", de kaart heet "NetSuite". */

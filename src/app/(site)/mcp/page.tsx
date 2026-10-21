@@ -8,14 +8,14 @@ export const metadata: Metadata = {
 const SYSTEMS = [
   {
     name: "Exact Online",
-    icon: "/exact-icon.png",
+    icon: "/img/exact-icon.png",
     description:
       "Connect your Exact Online administraties. Read-only access to financials, orders, and more.",
     href: "https://eol.appwizer.com/aanmelden",
   },
   {
     name: "Twinfield",
-    icon: "/twinfield-icon.png",
+    icon: "/img/twinfield-icon.png",
     description:
       "Connect your Twinfield administration via Cube API. Read-only access to balance sheet, P&L, and open items.",
     href: "https://twf.appwizer.com/aanmelden",

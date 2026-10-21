@@ -21,7 +21,7 @@ const isProduction = process.env.VERCEL_ENV === "production";
 
 const config = {
   async rewrites() {
-    const beforeFiles: { source: string; destination: string; has?: { type: "host"; value: string }[] }[] = [];
+    const beforeFiles = [];
 
     // Nieuw, pad-gebaseerd, host-onafhankelijk: de kaarten op /mcp linken niet
     // hierheen (die zijn voor JSON-RPC/OAuth-verkeer, geen menselijke
@@ -41,7 +41,7 @@ const config = {
     // de veronderstelling dat een latere regel 'm alsnog oppakt werkt niet
     // (precies de bug die mcp-hub's huidige /mcp- en /c/:slug/mcp-aliassen
     // vandaag al breekt).
-    const mcpHost = [{ type: "host" as const, value: "mcp.appwizer.com" }];
+    const mcpHost = [{ type: "host", value: "mcp.appwizer.com" }];
     if (EXACT_MCP_URL) {
       beforeFiles.push({ source: "/exact/:path*", has: mcpHost, destination: `${EXACT_MCP_URL}/exact/:path*` });
       beforeFiles.push({ source: "/mcp/:path*", has: mcpHost, destination: `${EXACT_MCP_URL}/exact/mcp/:path*` });

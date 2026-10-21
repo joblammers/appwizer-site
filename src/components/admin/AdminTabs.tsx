@@ -6,19 +6,20 @@ interface Props {
   resultsPanel: ReactNode;
   scansPanel: ReactNode;
   casesPanel: ReactNode;
+  mcpPanel: ReactNode;
 }
 
-type Tab = "results" | "beheer" | "cases";
+type Tab = "results" | "beheer" | "cases" | "mcp";
 
 /**
- * Drie toptabs (Scanresultaten / Beheer / Klantcases) — elk een eigen
- * volledige pagina in plaats van geneste sub-tabs, want klantcases hebben
- * hun eigen filters (applicatie, klant) en horen niet verstopt onder Beheer.
- * Admins wisselen hier hooguit een paar keer per bezoek tussen: standaard
- * kleurovergang (`ease`, ~150ms), geen decoratieve motion nodig voor iets dat
- * zo weinig voorkomt.
+ * Vier toptabs (Scanresultaten / Beheer / Klantcases / MCP-aanmeldingen) —
+ * elk een eigen volledige pagina in plaats van geneste sub-tabs, want zowel
+ * klantcases als MCP-aanmeldingen hebben hun eigen filters/acties en horen
+ * niet verstopt onder Beheer. Admins wisselen hier hooguit een paar keer per
+ * bezoek tussen: standaard kleurovergang (`ease`, ~150ms), geen decoratieve
+ * motion nodig voor iets dat zo weinig voorkomt.
  */
-export function AdminTabs({ resultsPanel, scansPanel, casesPanel }: Props) {
+export function AdminTabs({ resultsPanel, scansPanel, casesPanel, mcpPanel }: Props) {
   const [tab, setTab] = useState<Tab>("results");
 
   return (
@@ -33,12 +34,16 @@ export function AdminTabs({ resultsPanel, scansPanel, casesPanel }: Props) {
         <TabButton active={tab === "cases"} onClick={() => setTab("cases")}>
           Klantcases
         </TabButton>
+        <TabButton active={tab === "mcp"} onClick={() => setTab("mcp")}>
+          MCP-aanmeldingen
+        </TabButton>
       </div>
 
       <div className="mt-6">
         {tab === "results" && resultsPanel}
         {tab === "beheer" && scansPanel}
         {tab === "cases" && casesPanel}
+        {tab === "mcp" && mcpPanel}
       </div>
     </div>
   );

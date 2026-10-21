@@ -1,5 +1,45 @@
 import { isDatabaseConfigured, sql } from "@/lib/db";
 
+export type McpTenantStatus = "pending" | "approved";
+
+export interface McpTenant {
+  slug: string;
+  name: string;
+  email: string | null;
+  exactClientId: string | null;
+  twinfieldClientId: string | null;
+  twinfieldBaseUrl: string | null;
+  status: McpTenantStatus;
+  createdAt: string;
+  approvedAt: string | null;
+}
+
+interface McpTenantRow {
+  slug: string;
+  name: string;
+  email: string | null;
+  exact_client_id: string | null;
+  twinfield_client_id: string | null;
+  twinfield_base_url: string | null;
+  status: string;
+  created_at: string;
+  approved_at: string | null;
+}
+
+function mapTenantRow(row: McpTenantRow): McpTenant {
+  return {
+    slug: row.slug,
+    name: row.name,
+    email: row.email,
+    exactClientId: row.exact_client_id,
+    twinfieldClientId: row.twinfield_client_id,
+    twinfieldBaseUrl: row.twinfield_base_url,
+    status: row.status === "approved" ? "approved" : "pending",
+    createdAt: row.created_at,
+    approvedAt: row.approved_at,
+  };
+}
+
 let mcpBootstrapped: Promise<void> | null = null;
 
 /**
@@ -70,7 +110,7 @@ async function bootstrapMCP(): Promise<void> {
       await sql`
         CREATE TABLE IF NOT EXISTS mcp_oauth_codes (
           code_hash TEXT PRIMARY KEY,
-          grant JSONB NOT NULL,
+          grant_data JSONB NOT NULL,
           expires_at TIMESTAMPTZ NOT NULL
         )
       `;
@@ -140,8 +180,9 @@ export const mcp = {
         INSERT INTO mcp_cache (key, value, expires_at)
         VALUES (${key}, ${JSON.stringify(value)}::jsonb, ${expiresAt})
         ON CONFLICT (key) DO NOTHING
+        RETURNING key
       `;
-      return (result.count ?? 0) > 0;
+      return result.length > 0;
     },
   },
 
@@ -176,17 +217,26 @@ export const mcp = {
       `;
     },
 
-    async get(slug: string): Promise<Record<string, unknown> | null> {
+    async get(slug: string): Promise<McpTenant | null> {
       if (!sql) return null;
       await bootstrapMCP();
-      const rows = (await sql`SELECT * FROM mcp_tenants WHERE slug = ${slug}`) as Record<string, unknown>[];
-      return rows.length > 0 ? rows[0] : null;
+      const rows = (await sql`
+        SELECT slug, name, email, exact_client_id, twinfield_client_id, twinfield_base_url,
+          status, created_at, approved_at
+        FROM mcp_tenants WHERE slug = ${slug}
+      `) as McpTenantRow[];
+      return rows.length > 0 ? mapTenantRow(rows[0]) : null;
     },
 
-    async list(): Promise<Record<string, unknown>[]> {
+    async list(): Promise<McpTenant[]> {
       if (!sql) return [];
       await bootstrapMCP();
-      return (await sql`SELECT * FROM mcp_tenants ORDER BY created_at DESC`) as Record<string, unknown>[];
+      const rows = (await sql`
+        SELECT slug, name, email, exact_client_id, twinfield_client_id, twinfield_base_url,
+          status, created_at, approved_at
+        FROM mcp_tenants ORDER BY created_at DESC
+      `) as McpTenantRow[];
+      return rows.map(mapTenantRow);
     },
 
     async approve(slug: string): Promise<void> {

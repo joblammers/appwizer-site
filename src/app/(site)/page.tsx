@@ -88,6 +88,10 @@ const SYSTEMS = [
 
 const heading = "font-[family-name:var(--font-space-grotesk)]";
 
+// Tijdelijk verborgen op verzoek — data/admin-tab blijven intact, alleen de
+// homepage-sectie staat uit. Terugzetten: op true.
+const SHOW_AI_PROJECTS = false;
+
 /**
  * Homepage-body — header en footer zitten in (site)/layout.tsx en gelden
  * voor elke publieke pagina; dit bestand is alleen de content ertussen
@@ -204,20 +208,22 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)]">
-        <div className="mx-auto mb-14 max-w-[600px] text-center">
-          <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-appwizer-orange">
-            AI-PROJECTEN
+      {SHOW_AI_PROJECTS && (
+        <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)]">
+          <div className="mx-auto mb-14 max-w-[600px] text-center">
+            <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-appwizer-orange">
+              AI-PROJECTEN
+            </div>
+            <h2 className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
+              Praktijkvoorbeelden van AI-optimalisatie
+            </h2>
+            <p className="mt-3.5 text-base text-muted-foreground">
+              Een greep uit de automatiseringsprojecten die we voor klanten hebben gebouwd.
+            </p>
           </div>
-          <h2 className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
-            Praktijkvoorbeelden van AI-optimalisatie
-          </h2>
-          <p className="mt-3.5 text-base text-muted-foreground">
-            Een greep uit de automatiseringsprojecten die we voor klanten hebben gebouwd.
-          </p>
+          <AiProjectsGrid projects={aiProjects} />
         </div>
-        <AiProjectsGrid projects={aiProjects} />
-      </div>
+      )}
 
       <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">
         <h2 className={`m-0 mb-[18px] text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.02em] ${heading}`}>
