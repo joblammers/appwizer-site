@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="860" viewBox="0 0 500 430" role="img" aria-label="Illustratie: documenten gaan via AI naar je boekhoudsoftware, uitzonderingen worden opgelost en het systeem leert mee">
+  <rect width="500" height="430" rx="24" fill="#121E36"/>
+  <g fill="none" stroke="#3A5F8A" stroke-width="2" stroke-linecap="round">
+    <path d="M134 115 C170 115 160 215 198 215"/>
+    <path d="M134 215 H198"/>
+    <path d="M134 315 C170 315 160 215 198 215"/>
+  </g>
+  <g>
+    <rect x="24" y="75" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="91" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="108" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="120" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="132" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="24" y="175" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="191" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="208" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="220" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="232" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="24" y="275" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="291" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="308" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="320" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="332" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+  </g>
+  <circle cx="250" cy="215" r="78" fill="none" stroke="#DF7D3C" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round"/>
+  <circle cx="250" cy="215" r="52" fill="#5C94CD"/>
+  <path d="M250 183 C252 204 261 213 282 215 C261 217 252 226 250 247 C248 226 239 217 218 215 C239 213 248 204 250 183 Z" fill="#0B1424"/>
+  <path d="M312 138 C313 146 316 149 324 150 C316 151 313 154 312 162 C311 154 308 151 300 150 C308 149 311 146 312 138 Z" fill="#DF7D3C"/>
+  <path d="M196 282 C196.6 286 198 287.4 202 288 C198 288.6 196.6 290 196 294 C195.4 290 194 288.6 190 288 C194 287.4 195.4 286 196 282 Z" fill="#A8CBEE"/>
+  <path d="M302 215 H336" fill="none" stroke="#5C94CD" stroke-width="2" stroke-linecap="round"/>
+  <path d="M346 215 L335 208 L335 222 Z" fill="#5C94CD"/>
+  <rect x="346" y="95" width="130" height="240" rx="14" fill="#FFFFFF"/>
+  <path d="M346 109 a14 14 0 0 1 14 -14 H462 a14 14 0 0 1 14 14 V123 H346 Z" fill="#E4EEF8"/>
+  <circle cx="362" cy="109" r="4" fill="#DF7D3C"/>
+  <circle cx="376" cy="109" r="4" fill="#A8CBEE"/>
+  <circle cx="390" cy="109" r="4" fill="#5C94CD"/>
+  <g>
+    <circle cx="366" cy="157" r="10" fill="#5C94CD"/>
+    <path d="M361.5 157 L365 160.5 L371 153.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="153" width="72" height="8" rx="4" fill="#C9D2E4"/>
+    <circle cx="366" cy="199" r="10" fill="#5C94CD"/>
+    <path d="M361.5 199 L365 202.5 L371 195.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="195" width="60" height="8" rx="4" fill="#C9D2E4"/>
+    <circle cx="366" cy="241" r="10" fill="#DF7D3C"/>
+    <rect x="364.8" y="234.5" width="2.4" height="8" rx="1.2" fill="#0B1424"/>
+    <circle cx="366" cy="246.5" r="1.4" fill="#0B1424"/>
+    <rect x="386" y="237" width="68" height="8" rx="4" fill="#F4D3BB"/>
+    <circle cx="366" cy="283" r="10" fill="#5C94CD"/>
+    <path d="M361.5 283 L365 286.5 L371 279.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="279" width="64" height="8" rx="4" fill="#C9D2E4"/>
+  </g>
+  <path d="M411 339 V392 H79 V369" fill="none" stroke="#DF7D3C" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M79 357 L72 369 L86 369 Z" fill="#DF7D3C"/>
+  <rect x="190" y="377" width="110" height="30" rx="15" fill="#121E36"/>
+  <text x="245" y="397" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="600" fill="#A8CBEE">leert mee</text>
+</svg>

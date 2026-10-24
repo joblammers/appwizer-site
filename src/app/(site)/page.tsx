@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { QuickscanModalButton } from "@/components/QuickscanModalButton";
 import { QuickscanDropdown } from "@/components/site/QuickscanDropdown";
-import { HeroThermometerDemo } from "@/components/site/HeroThermometerDemo";
+import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { AiProjectsGrid } from "@/components/site/AiProjectsGrid";
 import { SystemsGrid } from "@/components/site/SystemsGrid";
 import { WorkflowSteps } from "@/components/site/WorkflowSteps";
@@ -27,35 +25,25 @@ const STEPS = [
     n: "01",
     title: "Quickscan & analyse",
     body: "We brengen je huidige facturatie-, boekhoud- en salarisprocessen in kaart en signaleren knelpunten.",
+    benefit: "Inzicht in waar tijd weglekt",
   },
   {
     n: "02",
     title: "Rapport & advies",
-    body: "Je ontvangt een concreet rapport met knelpunten, werkinstructies en optimalisatie-alternatieven.",
+    body: "Je ontvangt een concreet rapport met knelpunten, een verbeterplan, werkinstructies en optimalisatie-alternatieven.",
+    benefit: "Een rapport om op te sturen",
   },
   {
     n: "03",
     title: "Implementatie",
-    body: "We richten de automatisering in binnen je bestaande software — geen migratie, wel resultaat.",
+    body: "We configureren en automatiseren binnen je bestaande software — geen migratie, wel resultaat.",
+    benefit: "Minder handwerk, zelfde software",
   },
   {
     n: "04",
     title: "Continue optimalisatie",
     body: "We gebruiken AI om slim te automatiseren, en dat stopt niet na de livegang.",
-    bullets: [
-      {
-        label: "Slimmer",
-        text: "lost uitzonderingen zelf op.",
-      },
-      {
-        label: "Leert mee",
-        text: "handelt steeds meer zelfstandig af.",
-      },
-      {
-        label: "Breidt uit",
-        text: "stap voor stap naar nieuwe processen.",
-      },
-    ],
+    benefit: "Resultaat dat blijft verbeteren",
   },
 ];
 
@@ -70,11 +58,11 @@ const SYSTEMS = [
   },
   {
     name: "Exact Online",
-    body: "Automatische matching en boeking van facturen en bankmutaties.",
+    body: "Automatische matching en boeking van facturen en bankmutaties, inrichting van modules als Uren & Facturen en Handel, en daarnaast een uitgebreide voorraadanalyse.",
   },
   {
     name: "Twinfield",
-    body: "Gestandaardiseerde verwerking van verkoop- en inkoopfacturen met minder handwerk.",
+    body: "Gestandaardiseerde verwerking van verkoop- en inkoopfacturen, bankafschriftverwerking en managementrapportages.",
   },
   {
     name: "Simplicate",
@@ -103,14 +91,16 @@ const SHOW_AI_PROJECTS = false;
  * Eigen fonts via next/font (Space Grotesk voor koppen, IBM Plex Sans voor
  * de rest — zie layout.tsx in de app-root).
  *
- * "Doe de Quickscan" opent de scan in een lightbox (QuickscanModalButton) —
- * zoals de Cal.com-popup, maar dan de ScanRunner zelf in een Modal in plaats
- * van weg te navigeren naar /mkb. De eindconversie is QuickscanDropdown: een
- * knop met keuzemenu (alle zichtbare scans), die de gekozen scan in diezelfde
- * soort lightbox opent — vervangt de eerdere Cal.com-boekingsknop hier.
+ * De hero is een carrousel (HeroCarousel, 3 varianten uit Job's Claude
+ * Design-canvas) die elke 30s wisselt — zie dat bestand voor de details.
+ * Verderop opent "Doe de Quickscan" de scan in een lightbox
+ * (QuickscanModalButton) i.p.v. weg te navigeren naar /mkb. De eindconversie
+ * is QuickscanDropdown: een knop met keuzemenu (alle zichtbare scans), die de
+ * gekozen scan in diezelfde soort lightbox opent.
  */
 export default async function HomePage() {
   const scan = await getScan("mkb");
+  const huisartsScan = await getScan("huisarts");
   const peerScores = scan ? await getCategoryAverages(scan.slug) : {};
   const allCases = await getAllCases();
   const cases = allCases.filter((c) => c.category !== "ai");
@@ -123,44 +113,11 @@ export default async function HomePage() {
       className="bg-background text-foreground"
       style={{ fontFamily: "var(--font-ibm-plex-sans), Arial, sans-serif" }}
     >
-      <div
-        className="mx-auto grid max-w-[1200px] items-center gap-[60px] px-6 pt-8 pb-20 sm:pt-12"
-        style={{ gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))" }}
-      >
-        <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-appwizer-blue/10 px-3.5 py-1.75 text-[13px] font-semibold text-appwizer-blue">
-            Voor finance &amp; controllers in het MKB
-          </div>
-          <h1
-            className={`m-0 mb-[22px] text-[clamp(32px,5vw,52px)] leading-[1.12] font-bold tracking-[-0.02em] ${heading}`}
-          >
-            Wij optimaliseren herhalende taken door ze zoveel mogelijk te automatiseren.
-          </h1>
-          <p className="m-0 mb-[34px] max-w-[520px] text-lg leading-[1.6] text-muted-foreground">
-            AppWizer analyseert en optimaliseert je administratieve processen in NetSuite,
-            Odoo, Exact Online, Twinfield — en laat exact zien waar tijd en geld weglekt.
-          </p>
-          <div className="flex flex-wrap items-center gap-4">
-            {scan ? (
-              <QuickscanModalButton
-                scan={scan}
-                label="Doe de Quickscan"
-                peerScores={peerScores}
-                className="rounded-xl bg-appwizer-orange px-7 py-3.75 text-base font-semibold text-white shadow-[0_10px_24px_-8px_rgba(223,125,60,0.45)] transition hover:brightness-110"
-              />
-            ) : (
-              <Link
-                href="/mkb"
-                className="rounded-xl bg-appwizer-orange px-7 py-3.75 text-base font-semibold text-white no-underline shadow-[0_10px_24px_-8px_rgba(223,125,60,0.45)]"
-              >
-                Doe de Quickscan
-              </Link>
-            )}
-          </div>
-        </div>
-
-        <HeroThermometerDemo />
-      </div>
+      <HeroCarousel
+        mkbScan={scan ?? null}
+        huisartsScan={huisartsScan ?? null}
+        peerScores={peerScores}
+      />
 
       <div className="border-t border-b border-border bg-surface">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-5 px-6 py-7">
@@ -182,26 +139,30 @@ export default async function HomePage() {
           <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-appwizer-orange">
             ONZE WERKWIJZE
           </div>
-          <h2 className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
+          <h2 className={`m-0 mb-4 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] ${heading}`}>
             Van knelpunt naar automatisering in vier stappen
           </h2>
+          <p className="m-0 text-base leading-[1.6] text-muted-foreground lg:text-lg">
+            Elke stap levert iets concreets op. We gebruiken AI om het herhalende werk te
+            automatiseren, zodat jij sneller resultaat ziet.
+          </p>
         </div>
         <WorkflowSteps steps={STEPS} />
       </div>
 
       <div id="software" className="bg-[#16324A] px-6 py-[clamp(56px,10vw,100px)]">
         <div className="mx-auto max-w-[1200px]">
-          <div className="mx-auto mb-14 max-w-[600px] text-center">
+          <div className="mx-auto mb-14 max-w-[820px] text-center">
             <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-[#F3C6A2]">
               PER SYSTEEM
             </div>
             <h2
-              className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] text-white ${heading}`}
+              className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] text-white sm:whitespace-nowrap ${heading}`}
             >
               Procesoptimalisatie binnen jouw software
             </h2>
             <p className="mt-3.5 text-base text-[#B7CBDD]">
-              We werken met de tools die je al gebruikt — geen migratie nodig.
+              We werken met de software die je al gebruikt — geen migratie nodig.
             </p>
           </div>
           <SystemsGrid systems={SYSTEMS} cases={cases} />
@@ -225,7 +186,7 @@ export default async function HomePage() {
         </div>
       )}
 
-      <div className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">
+      <div id="gesprek" className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">
         <h2 className={`m-0 mb-[18px] text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.02em] ${heading}`}>
           Wil je weten wat automatisering jou oplevert?
         </h2>

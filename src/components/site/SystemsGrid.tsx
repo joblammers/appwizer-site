@@ -115,28 +115,54 @@ export function SystemsGrid({ systems, cases }: { systems: System[]; cases: Clie
       className="grid gap-5"
       style={{ gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))" }}
     >
-      {systems.map((system, i) => (
-        <button
-          key={system.name}
-          type="button"
-          onClick={() => setOpenSystem(system.name)}
-          data-inview={inView || undefined}
-          className="system-card relative flex w-full flex-col rounded-2xl border border-white/[0.12] bg-white/[0.07] p-[26px] text-left"
-          style={{ transitionDelay: `${i * 50}ms` }}
-        >
-          <SystemIcon
-            name={system.name}
-            className="absolute top-[22px] right-[22px] h-5 w-5 text-white/30"
-          />
-          <h3 className="m-0 mb-2 max-w-[85%] text-lg font-semibold text-white font-[family-name:var(--font-space-grotesk)]">
-            {system.name}
-          </h3>
-          <p className="m-0 text-[14.5px] leading-[1.6] text-[#B7CBDD]">{system.body}</p>
-          <span className="mt-4 text-[13.5px] font-semibold text-white/70">
-            Bekijk klantcase →
-          </span>
-        </button>
-      ))}
+      {systems.map((system, i) => {
+        const caseCount = matchCases(cases, system.name).length;
+        const cardClassName =
+          "system-card relative flex w-full flex-col rounded-2xl border border-white/[0.12] bg-white/[0.07] p-[26px] text-left";
+        const cardContent = (
+          <>
+            <SystemIcon
+              name={system.name}
+              className="absolute top-[22px] right-[22px] h-5 w-5 text-white/30"
+            />
+            <h3 className="m-0 mb-2 max-w-[85%] text-lg font-semibold text-white font-[family-name:var(--font-space-grotesk)]">
+              {system.name}
+            </h3>
+            <p className="m-0 text-[14.5px] leading-[1.6] text-[#B7CBDD]">{system.body}</p>
+            {caseCount > 0 && (
+              <span className="mt-auto pt-4 text-[13.5px] font-semibold text-white/70">
+                Bekijk klantcases →
+              </span>
+            )}
+          </>
+        );
+
+        if (caseCount === 0) {
+          return (
+            <div
+              key={system.name}
+              data-inview={inView || undefined}
+              className={cardClassName}
+              style={{ transitionDelay: `${i * 50}ms` }}
+            >
+              {cardContent}
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={system.name}
+            type="button"
+            onClick={() => setOpenSystem(system.name)}
+            data-inview={inView || undefined}
+            className={cardClassName}
+            style={{ transitionDelay: `${i * 50}ms` }}
+          >
+            {cardContent}
+          </button>
+        );
+      })}
 
       {openSystem && (
         <Modal

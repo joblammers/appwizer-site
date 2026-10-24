@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
-import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Sans, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 /**
@@ -18,6 +18,12 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
   variable: "--font-space-grotesk",
+});
+/** Alleen voor de hero-carrousel-varianten (src/components/site/hero-slides/) — eigen typografie uit dat ontwerp, de rest van de site blijft bij Space Grotesk/IBM Plex Sans. */
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -54,7 +60,10 @@ Cal.ns.quickscan("ui", {"styles":{"branding":{"brandColor":"#DF7D3C"}},"hideEven
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="nl" className={`${ibmPlexSans.variable} ${spaceGrotesk.variable}`}>
+    <html
+      lang="nl"
+      className={`${ibmPlexSans.variable} ${spaceGrotesk.variable} ${plusJakartaSans.variable}`}
+    >
       <body>
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInitScript}

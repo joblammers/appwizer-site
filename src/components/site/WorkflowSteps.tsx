@@ -1,86 +1,108 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { ArrowBigDown, ArrowBigRight } from "lucide-react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 
 interface Step {
   n: string;
   title: string;
   body: string;
-  bullets?: { label: string; text: string }[];
+  benefit: string;
 }
 
-const STAGGER_MS = 45;
+const STAGGER_MS = 80;
+const HIGHLIGHT_MS = 15_000;
 
 function delayStyle(ms: number): CSSProperties {
   return { "--reveal-delay": `${ms}ms` } as CSSProperties;
 }
 
 /**
- * Vier stappen met pijlen ertussen die de volgorde van het proces tonen —
- * gestapeld met een verticale pijl (↓) op smalle schermen, op een rij met
- * horizontale pijlen (→) vanaf lg. Kaarten én pijlen verschijnen in dezelfde
- * gestaggerde scroll-reveal (.reveal-step in globals.css, gedeeld met
- * SystemsGrid) zodra de sectie voor het eerst in beeld komt — "explanation" +
- * "spatial consistency": de pijlen tonen letterlijk waar het proces naartoe
- * gaat, niet decoratie. Het stapnummer krijgt zijn eigen, iets latere
- * pop-in (.reveal-step-number) voor wat meer laagjes in de reveal, en de
- * horizontale pijl blijft daarna zachtjes naar rechts "vloeien"
- * (.arrow-flow-right) om de procesrichting te onderstrepen.
+ * Vier-fasen-kaarten uit Job's Claude Design-canvas ("Onze werkwijze"),
+ * overgenomen met site-kleuren i.p.v. het ontwerp's eigen blauw/zwart
+ * (appwizer-blue voor de stapnummers, hetzelfde navy/oranje-duo #16324A /
+ * #F3C6A2 als de bestaande #software-sectie en de AI-hero-slide). Een
+ * doorlopende lijn (alleen vanaf lg, net als in het ontwerp) verbindt de vier
+ * genummerde cirkels boven de kaarten — spatial consistency, geen pijlen meer
+ * nodig om de volgorde te tonen.
+ *
+ * De donkere kaart-styling hoort NIET vast bij één stap — die beweegt mee
+ * met de highlight: elke 15s krijgt de volgende fase de donkere achtergrond +
+ * gevulde oranje cirkel, de rest blijft licht. Pauzeert op
+ * prefers-reduced-motion (dan blijft gewoon fase 1 gemarkeerd, geen
+ * doorlopende wissel-beweging). Scroll-reveal blijft hetzelfde patroon als
+ * SystemsGrid (.reveal-step in globals.css).
  */
 export function WorkflowSteps({ steps }: { steps: Step[] }) {
   const { ref, inView } = useInViewOnce<HTMLDivElement>();
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => {
+      setActive((i) => (i + 1) % steps.length);
+    }, HIGHLIGHT_MS);
+    return () => clearInterval(id);
+  }, [inView, steps.length]);
 
   return (
-    <div ref={ref} className="flex flex-col items-stretch gap-4 lg:flex-row">
-      {steps.map((step, i) => (
-        <div key={step.n} className="contents">
+    <div ref={ref} className="relative grid grid-cols-1 gap-6 lg:grid-cols-4">
+      <div
+        aria-hidden="true"
+        className="absolute top-7 right-7 left-7 hidden h-px bg-border lg:block"
+      />
+      {steps.map((step, i) => {
+        const isActive = i === active;
+        return (
           <div
+            key={step.n}
             data-inview={inView || undefined}
-            className="reveal-step relative w-full rounded-[18px] border border-border bg-surface p-8 lg:flex-1"
-            style={delayStyle(i * 2 * STAGGER_MS)}
+            className="reveal-step relative flex flex-col gap-5"
+            style={delayStyle(i * STAGGER_MS)}
           >
-            <span
-              className="reveal-step-number absolute top-8 right-7 font-[family-name:var(--font-space-grotesk)] text-sm font-bold text-appwizer-blue/50"
-            >
-              {step.n}
-            </span>
-            <h3 className="m-0 mb-2.5 max-w-[85%] text-[19px] font-semibold">{step.title}</h3>
-            <p className="m-0 text-[15px] leading-[1.6] text-muted-foreground">{step.body}</p>
-            {step.bullets && (
-              <ul className="m-0 mt-2.5 space-y-1 text-[15px] leading-[1.6] text-muted-foreground">
-                {step.bullets.map((bullet) => (
-                  <li key={bullet.label} className="flex gap-2">
-                    <span className="text-appwizer-orange" aria-hidden="true">
-                      •
-                    </span>
-                    <span>
-                      <span className="font-semibold text-foreground">{bullet.label}:</span>{" "}
-                      {bullet.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {i < steps.length - 1 && (
             <div
-              data-inview={inView || undefined}
-              aria-hidden="true"
-              className="reveal-step flex shrink-0 items-center justify-center text-muted-foreground"
-              style={delayStyle((i * 2 + 1) * STAGGER_MS)}
+              className={`relative z-10 flex h-14 w-14 items-center justify-center rounded-full border-2 text-xl font-extrabold transition-all duration-500 ${
+                isActive
+                  ? "border-appwizer-orange bg-appwizer-orange text-white ring-4 ring-appwizer-orange/25"
+                  : "border-appwizer-blue bg-surface text-appwizer-blue"
+              }`}
             >
-              <ArrowBigDown className="h-7 w-7 lg:hidden" fill="currentColor" />
-              <ArrowBigRight
-                className="arrow-flow-right hidden h-7 w-7 lg:block"
-                fill="currentColor"
-              />
+              <span className="reveal-step-number">{step.n}</span>
             </div>
-          )}
-        </div>
-      ))}
+            <div
+              className={`relative flex flex-1 flex-col gap-3 rounded-[20px] p-7 transition-all duration-500 ${
+                isActive
+                  ? "-translate-y-1 bg-[#16324A] text-white shadow-lg ring-2 ring-appwizer-orange/50"
+                  : "border border-border bg-surface text-foreground shadow-sm"
+              }`}
+            >
+              <h3 className="m-0 text-[19px] font-semibold tracking-[-0.01em]">{step.title}</h3>
+              <p
+                className={`m-0 text-[15px] leading-[1.6] ${
+                  isActive ? "text-[#B7CBDD]" : "text-muted-foreground"
+                }`}
+              >
+                {step.body}
+              </p>
+              <div
+                className={`mt-auto flex flex-col gap-1.5 border-t pt-4 ${
+                  isActive ? "border-[#234159]" : "border-border"
+                }`}
+              >
+                <div
+                  className={`text-xs font-bold tracking-[0.08em] ${
+                    isActive ? "text-[#9FB7CC]" : "text-muted-foreground"
+                  }`}
+                >
+                  JIJ KRIJGT
+                </div>
+                <div className="text-[15px] font-semibold">{step.benefit}</div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
