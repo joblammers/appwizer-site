@@ -67,6 +67,15 @@ function toneFor(percentage: number): keyof typeof TONE_HEX {
  * De eigen nav/logo-balk uit het ontwerp is weggelaten: SiteHeader voorziet
  * daar al in boven de carrousel, een tweede balk zou dubbel ogen.
  *
+ * Gebruikt de thema-tokens (bg-background/text-foreground/bg-surface/
+ * text-muted-foreground/border-border) i.p.v. de ontwerp's eigen vaste hex-
+ * kleuren, zodat deze slide (als enige van de drie) gewoon meeschakelt met
+ * de licht/donker-toggle — slides 2 en 3 zijn bewust vaste donkere banden,
+ * net als de #software-sectie, maar deze slide hoort zich wél aan te passen.
+ * Het voorbeeldresultaat-kaartje is verborgen onder lg: op mobiel viel het
+ * over de tekst heen binnen de vaste hoogte van de carrousel (HeroCarousel.tsx) —
+ * zelfde reden als de fotopaneel-afweging bij slide 3.
+ *
  * Het voorbeeldresultaat-kaartje wisselt elke 5s random naar een andere
  * realistische combi (percentage/uren/euro's horen bij elkaar) — zelfde
  * ambient-patroon als de vorige HeroThermometerDemo, alleen sneller omdat dit
@@ -96,18 +105,18 @@ export function HeroSlideOptimalisatie({
   }, []);
 
   return (
-    <div className={`flex h-full w-full flex-col bg-[#FAF4EF] text-[#2B1B0F] ${jakarta}`}>
+    <div className={`flex h-full w-full flex-col bg-background text-foreground ${jakarta}`}>
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center gap-10 px-6 py-12 lg:flex-row lg:gap-18 lg:py-0">
         <div className="flex flex-1 flex-col items-start gap-6">
-          <div className="rounded-full bg-[#FBE6D4] px-4 py-2 text-sm font-semibold text-appwizer-orange">
+          <div className="rounded-full bg-appwizer-orange/15 px-4 py-2 text-sm font-semibold text-appwizer-orange">
             Voor finance &amp; controllers in het MKB
           </div>
           <h1 className="m-0 text-[clamp(32px,4.5vw,56px)] leading-[1.08] font-extrabold tracking-[-0.03em]">
             Zie precies waar je administratie tijd en geld lekt.
           </h1>
-          <p className="m-0 max-w-[520px] text-lg leading-[1.55] text-[#5C4A3C]">
-            Wij analyseren en optimaliseren je administratieve processen in NetSuite, Odoo,
-            Exact Online en Twinfield. Minder handwerk, binnen de software die je al hebt.
+          <p className="m-0 max-w-[520px] text-lg leading-[1.55] text-muted-foreground">
+            Wij analyseren en optimaliseren je administratieve processen in o.a. NetSuite, Odoo,
+            Exact Online en Twinfield. Minder handwerk, binnen de software die je al gebruikt.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             {scan ? (
@@ -125,15 +134,15 @@ export function HeroSlideOptimalisatie({
                 Doe de Quickscan
               </Link>
             )}
-            <a href="#werkwijze" className="px-6 py-4 text-lg font-semibold text-[#2B1B0F] no-underline">
+            <a href="#werkwijze" className="px-6 py-4 text-lg font-semibold text-foreground no-underline">
               Bekijk de werkwijze
             </a>
           </div>
         </div>
 
-        <div className="w-full max-w-[480px] flex-none rounded-3xl bg-white p-9 shadow-[0_24px_60px_-12px_rgba(223,125,60,0.25)]">
+        <div className="hidden w-full max-w-[480px] flex-none rounded-3xl bg-surface p-9 shadow-[0_24px_60px_-12px_rgba(223,125,60,0.25)] lg:block">
           <div className="flex items-center justify-between">
-            <div className="text-[13px] font-bold tracking-[0.08em] text-[#8A7A6C]">
+            <div className="text-[13px] font-bold tracking-[0.08em] text-muted-foreground">
               QUICKSCAN RESULTAAT
             </div>
             <div className="rounded-full bg-[#DDF4E7] px-3 py-1.5 text-[13px] font-semibold text-[#1B7A4B]">
@@ -144,18 +153,18 @@ export function HeroSlideOptimalisatie({
             <div className="text-[72px] leading-[0.9] font-extrabold tracking-[-0.04em] text-appwizer-orange transition-all duration-300 sm:text-[88px]">
               {demo.percentage}%
             </div>
-            <div className="pb-1.5 text-base leading-[1.4] text-[#5C4A3C]">
+            <div className="pb-1.5 text-base leading-[1.4] text-muted-foreground">
               Jouw Administratie Optimalisatiegraad
             </div>
           </div>
           <div className="mt-6 flex flex-col gap-2">
-            <div className="h-3 overflow-hidden rounded-full bg-[#F1E4D8]">
+            <div className="h-3 overflow-hidden rounded-full bg-border">
               <div
                 className="h-full rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${demo.percentage}%`, backgroundColor: toneColor }}
               />
             </div>
-            <div className="flex justify-between text-[13px] font-medium text-[#8A7A6C]">
+            <div className="flex justify-between text-[13px] font-medium text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: TONE_HEX.low }} />
                 Laag
@@ -171,19 +180,19 @@ export function HeroSlideOptimalisatie({
             </div>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="rounded-2xl bg-[#FAF4EF] p-5">
+            <div className="rounded-2xl bg-background p-5">
               <div className="text-[28px] font-extrabold tracking-[-0.02em] transition-all duration-300">
                 {demo.hours} uur
               </div>
-              <div className="mt-1 text-sm leading-[1.4] text-[#5C4A3C] transition-all duration-300">
+              <div className="mt-1 text-sm leading-[1.4] text-muted-foreground transition-all duration-300">
                 per maand bespaard op {process}
               </div>
             </div>
-            <div className="rounded-2xl bg-[#FAF4EF] p-5">
+            <div className="rounded-2xl bg-background p-5">
               <div className="text-[28px] font-extrabold tracking-[-0.02em] transition-all duration-300">
-                € {demo.amount.toLocaleString("nl-NL")}
+                €&nbsp;{demo.amount.toLocaleString("nl-NL")}
               </div>
-              <div className="mt-1 text-sm leading-[1.4] text-[#5C4A3C]">
+              <div className="mt-1 text-sm leading-[1.4] text-muted-foreground">
                 per jaar geschatte besparing
               </div>
             </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { IBM_Plex_Sans, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
+import { BASE_OPEN_GRAPH, BASE_TWITTER } from "@/lib/seo";
 import "./globals.css";
 
 /**
@@ -26,9 +27,25 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
 });
 
+const SITE_URL = "https://appwizer.com";
+const DEFAULT_TITLE = "AppWizer — Automatisering van administratieve processen";
+const DEFAULT_DESCRIPTION =
+  "AppWizer analyseert en optimaliseert je administratieve processen in NetSuite, Odoo, Exact Online en Twinfield — en laat exact zien waar tijd en geld weglekt.";
+
+/**
+ * Fallback voor elke route die zelf geen metadata exporteert (bv. /admin).
+ * Pagina's die wél eigen metadata zetten (homepage, quickscan-routes,
+ * algemene-voorwaarden, enz.) overschrijven title/description/openGraph/
+ * twitter volledig per key (geen deep-merge met deze parent) — vandaar
+ * BASE_OPEN_GRAPH/BASE_TWITTER in lib/seo.ts, die elke pagina die zijn eigen
+ * openGraph zet ook zelf meeneemt.
+ */
 export const metadata: Metadata = {
-  title: "appwizer",
-  description: "Quickscan administratieve processen — appwizer.com",
+  metadataBase: new URL(SITE_URL),
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  openGraph: { ...BASE_OPEN_GRAPH, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
+  twitter: { ...BASE_TWITTER, title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
 };
 
 // Zet de .dark-klasse vóór hydratie, anders flitst de pagina eerst in het

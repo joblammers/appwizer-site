@@ -8,10 +8,18 @@ import { getScan, getScans } from "@/lib/quickscan/scans";
 import { getCategoryAverages } from "@/lib/quickscan/leads";
 import { getAllCases } from "@/lib/cases";
 
+/**
+ * Geen eigen openGraph/twitter hier: die velden worden per key volledig
+ * overschreven (niet gemerged) door een kind-metadata-object, en title/
+ * description hieronder zijn toevallig al identiek aan de defaults in
+ * layout.tsx — een override zou dus alleen risico lopen om siteName/locale/
+ * card daar per ongeluk te laten vallen, zonder dat er iets wijzigt.
+ */
 export const metadata: Metadata = {
   title: "AppWizer — Automatisering van administratieve processen",
   description:
     "AppWizer analyseert en optimaliseert je administratieve processen in NetSuite, Odoo, Exact Online en Twinfield — en laat exact zien waar tijd en geld weglekt.",
+  alternates: { canonical: "/" },
 };
 
 // Niet statisch cachen: de quickscan-inhoud in de popup kan via /admin
@@ -37,7 +45,7 @@ const STEPS = [
     n: "03",
     title: "Implementatie",
     body: "We configureren en automatiseren binnen je bestaande software — geen migratie, wel resultaat.",
-    benefit: "Minder handwerk, zelfde software",
+    benefit: "Minder handwerk, zelfde uitkomst",
   },
   {
     n: "04",
@@ -154,7 +162,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-[1200px]">
           <div className="mx-auto mb-14 max-w-[820px] text-center">
             <div className="mb-3 text-[13px] font-bold tracking-[0.06em] text-[#F3C6A2]">
-              PER SYSTEEM
+              KLANTCASES PER APPLICATIE
             </div>
             <h2
               className={`m-0 text-[clamp(26px,4vw,34px)] font-bold tracking-[-0.02em] text-white sm:whitespace-nowrap ${heading}`}

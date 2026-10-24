@@ -24,6 +24,12 @@ interface Props {
  * voorkomen (WCAG 2.2.2); puntjes en pijltjes blijven dan gewoon werken voor
  * wie zelf wil wisselen. CSS-opacity-cross-fade i.p.v. een harde wissel, puur
  * transform/opacity dus geen layout-kosten.
+ *
+ * Alle slides delen dezelfde grid-cel (grid-area 1/1) i.p.v. een losstaande
+ * vaste min-h-waarde — zo sizet de container zich automatisch naar de
+ * langste slide op elke breedte, in plaats van een geschat getal dat op
+ * mobiel (kortere viewportbreedte, dus meer regelafbrekingen en dus hogere
+ * content) de volgende sectie erover liet overlappen.
  */
 export function HeroCarousel({ mkbScan, huisartsScan, peerScores }: Props) {
   const slides = [
@@ -49,12 +55,12 @@ export function HeroCarousel({ mkbScan, huisartsScan, peerScores }: Props) {
   }, [slides.length]);
 
   return (
-    <div className="relative min-h-[560px] lg:min-h-[640px]">
+    <div className="relative grid">
       {slides.map((slide, i) => (
         <div
           key={i}
           aria-hidden={i !== active}
-          className="absolute inset-0 transition-opacity duration-500 ease-in-out"
+          className="col-start-1 row-start-1 w-full transition-opacity duration-500 ease-in-out"
           style={{ opacity: i === active ? 1 : 0, pointerEvents: i === active ? "auto" : "none" }}
         >
           {slide}

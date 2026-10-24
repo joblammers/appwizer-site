@@ -20,7 +20,7 @@ export function SiteFooter({ scans }: { scans: Scan[] }) {
           <Link href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element -- lokaal logo */}
             <img
-              src="/logo-appwizer.png"
+              src="/img/logo-appwizer.png"
               alt="AppWizer"
               className="block h-6 w-auto"
             />

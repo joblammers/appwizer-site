@@ -32,7 +32,9 @@ export function HeroSlideAI() {
             Zo werkt AppWizer: AI-first
           </div>
           <h1 className="m-0 text-[clamp(30px,4.2vw,52px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-white">
-            Wij zetten AI in om ons werk te automatiseren.
+            Wij zetten AI in om ons
+            <br />
+            werk te automatiseren.
           </h1>
           <p className="m-0 max-w-[580px] text-lg leading-[1.55] text-[#B7CBDD]">
             Jij wilt dat je administratie sneller en met minder handwerk loopt. Daarom zetten
@@ -61,7 +63,7 @@ export function HeroSlideAI() {
           </div>
         </div>
 
-        <div className="w-full max-w-[540px] flex-none rounded-3xl border border-[#234159] bg-[#1C3C56] px-7 py-7">
+        <div className="hidden w-full max-w-[480px] flex-none rounded-3xl border border-[#234159] bg-[#1C3C56] px-7 py-7 lg:block">
           {/* eslint-disable-next-line @next/next/no-img-element -- vast illustratiebestand, geen externe bron */}
           <img
             src="/img/appwizer-ai-werkwijze.svg"

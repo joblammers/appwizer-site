@@ -13,7 +13,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
  * plaats van de vaste kleuren van de rest van de homepage, zodat
  * licht/donker/systeem hier ook werkt — met de ThemeToggle ingebouwd in de
  * navbalk (geen losstaande variant meer nodig, want dit is nu de enige
- * schakelaar op elke pagina).
+ * schakelaar op elke pagina). Op mobiel blijft de ThemeToggle weg (op
+ * verzoek van Job) — ThemeToggle.tsx valt zonder opgeslagen voorkeur toch al
+ * terug op "systeem", dus dat blijft het effectieve gedrag. Logo wordt op
+ * mobiel vervangen door het compactere icoon (dezelfde afbeelding als de
+ * favicon) in plaats van de volledige wordmark.
  */
 export function SiteHeader() {
   return (
@@ -25,9 +29,15 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- lokaal logo */}
           <img
-            src="/logo-appwizer.png"
+            src="/img/logo-appwizer.png"
             alt="AppWizer"
-            className="block h-[26px] w-auto"
+            className="hidden h-[26px] w-auto sm:block"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element -- lokaal icoon (favicon), compactere versie van het logo voor mobiel */}
+          <img
+            src="/img/appwizer-icon.png"
+            alt="AppWizer"
+            className="block h-7 w-7 sm:hidden"
           />
         </Link>
         <div className="flex flex-wrap items-center gap-4 sm:gap-6">
@@ -44,7 +54,9 @@ export function SiteHeader() {
             Applicaties
           </Link>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
             <CalBookingLink
               label="Plan een gesprek"
               className="rounded-full bg-appwizer-orange px-5.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
