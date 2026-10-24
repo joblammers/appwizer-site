@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Answers, Scan, ScanResult } from "@/lib/quickscan/types";
 import { formatPercentage, maxPointsForQuestion } from "@/lib/quickscan/scoring";
+import { resultCardUrl } from "@/lib/quickscan/savingsEstimate";
 import { Modal } from "@/components/Modal";
 import { CalBookingLink } from "@/components/CalBookingLink";
 import { CategoryRadarChart } from "./CategoryRadarChart";
@@ -65,6 +66,24 @@ export function ScanResultView({ scan, result, answers, peerScores }: Props) {
           className="mt-6 inline-block w-full rounded-lg bg-appwizer-orange px-8 py-4 text-base font-semibold text-white transition hover:brightness-110 sm:w-auto"
         />
       </div>
+
+      <figure className="mt-8 flex flex-col items-center sm:mt-10">
+        {/* Twee varianten; globals.css toont er één, afhankelijk van de .dark-klasse op <html>. */}
+        {(["light", "dark"] as const).map((theme) => (
+          // eslint-disable-next-line @next/next/no-img-element -- statische SVG uit onze eigen route
+          <img
+            key={theme}
+            src={resultCardUrl(result.percentage, theme)}
+            alt={`Indicatie van je besparing bij een score van ${formatPercentage(result.percentage)}`}
+            width={480}
+            height={442}
+            className={`w-full max-w-sm rounded-3xl border border-border ${theme === "light" ? "theme-light-only" : "theme-dark-only"}`}
+          />
+        ))}
+        <figcaption className="mt-3 text-center text-sm text-muted-foreground">
+          Indicatief: de uren en het bedrag zijn een schatting op basis van je score.
+        </figcaption>
+      </figure>
 
       <h2 className="mt-10 text-xl font-semibold text-foreground sm:mt-14">
         Je score per onderdeel

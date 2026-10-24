@@ -18,7 +18,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
  * terug op "systeem", dus dat blijft het effectieve gedrag. Logo wordt op
  * mobiel vervangen door het compactere icoon (dezelfde afbeelding als de
  * favicon) in plaats van de volledige wordmark. De CTA-knop wordt op mobiel
- * ook ingekort ("Gesprek" i.p.v. "Plan een gesprek", met minder padding) en
+ * ook ingekort (minder padding; zelfde label "Maak afspraak" als op desktop) en
  * de balk zelf iets smaller (minder gap/padding) — anders past de balk niet
  * op één regel op een smalle telefoon.
  */
@@ -62,14 +62,14 @@ export function SiteHeader() {
             </div>
             <div className="hidden sm:block">
               <CalBookingLink
-                label="Plan een gesprek"
-                className="rounded-full bg-appwizer-orange px-5.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
+                label="Maak afspraak"
+                className="rounded-xl bg-appwizer-orange px-5.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
               />
             </div>
             <div className="sm:hidden">
               <CalBookingLink
-                label="Boek afspraak"
-                className="rounded-full bg-appwizer-orange px-3.5 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
+                label="Maak afspraak"
+                className="rounded-xl bg-appwizer-orange px-3.5 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
               />
             </div>
           </div>

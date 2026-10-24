@@ -27,6 +27,10 @@
   --surface: #f8fafc; /* slate-50 */
   --surface-hover: #f1f5f9; /* slate-100 */
   --border: #e2e8f0; /* slate-200 */
+  /* Gloed achter de hero-kaart (slide 1); in dark mode sterker, want een donkere schaduw valt weg tegen een donkere achtergrond. */
+  --hero-glow: rgba(223, 125, 60, 0.25);
+  --qs-badge-bg: #e4eef8;
+  --qs-badge-fg: #2e6aa6;
 }
 
 /*
@@ -40,6 +44,9 @@
   --surface: #1e293b; /* slate-800 */
   --surface-hover: #29374b;
   --border: #334155; /* slate-700 */
+  --hero-glow: rgba(223, 125, 60, 0.5);
+  --qs-badge-bg: rgba(92, 148, 205, 0.2);
+  --qs-badge-fg: #a8cbee;
 }
 
 body {
@@ -218,4 +225,16 @@ body {
   .hero-thermometer-fill {
     transition: fill 150ms ease !important;
   }
+}
+
+/* Inline quickscan-kaart in de hero (HeroQuickscanCard.tsx); gescoped zodat andere inline SVG's hun tekst houden. */
+.qs-card text {
+  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Plaatjes met een licht en een donker exemplaar (bv. de resultaatkaart); volgt de .dark-klasse, niet het systeemthema. */
+.dark .theme-light-only,
+:root:not(.dark) .theme-dark-only {
+  display: none;
 }

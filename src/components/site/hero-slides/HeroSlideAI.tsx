@@ -52,7 +52,7 @@ export function HeroSlideAI() {
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="#werkwijze"
-              className="rounded-full bg-appwizer-orange px-8 py-4 text-lg font-bold text-white no-underline transition hover:brightness-110"
+              className="rounded-xl bg-appwizer-orange px-8 py-4 text-lg font-bold text-white no-underline transition hover:brightness-110"
             >
               Bekijk hoe wij AI inzetten
             </a>
@@ -63,7 +63,7 @@ export function HeroSlideAI() {
           </div>
         </div>
 
-        <div className="hidden w-full max-w-[480px] flex-none rounded-3xl border border-[#234159] bg-[#1C3C56] px-7 py-7 lg:block">
+        <div className="hidden w-full max-w-[480px] flex-none rounded-3xl border border-[#234159] bg-[#1C3C56] px-7 py-7 shadow-[0_24px_70px_-12px_rgba(223,125,60,0.4)] lg:block">
           {/* eslint-disable-next-line @next/next/no-img-element -- vast illustratiebestand, geen externe bron */}
           <img
             src="/img/appwizer-ai-werkwijze-animatie.svg"

@@ -52,12 +52,12 @@ export function HeroSlideHuisartsen({ scan }: { scan: Scan | null }) {
               <QuickscanModalButton
                 scan={scan}
                 label="Start de nulmeting"
-                className="rounded-full bg-[#2FBF7F] px-8 py-4 text-lg font-bold text-[#0F1620] transition hover:brightness-110"
+                className="rounded-xl bg-[#2FBF7F] px-8 py-4 text-lg font-bold text-[#0F1620] transition hover:brightness-110"
               />
             ) : (
               <a
                 href="#werkwijze"
-                className="rounded-full bg-[#2FBF7F] px-8 py-4 text-lg font-bold text-[#0F1620] no-underline transition hover:brightness-110"
+                className="rounded-xl bg-[#2FBF7F] px-8 py-4 text-lg font-bold text-[#0F1620] no-underline transition hover:brightness-110"
               >
                 Start de nulmeting
               </a>
@@ -96,7 +96,7 @@ export function HeroSlideHuisartsen({ scan }: { scan: Scan | null }) {
           <img
             src="/img/a-photograph-of-a-dutch-general-practit.jpg"
             alt=""
-            className="h-full w-full rounded-tl-[32px] object-cover"
+            className="h-full w-full rounded-tl-[32px] object-cover shadow-[-24px_0_70px_-12px_rgba(47,191,127,0.35)]"
           />
           <div className="absolute inset-0 rounded-tl-[32px] bg-gradient-to-r from-[#19212D]/70 via-[#19212D]/10 to-transparent" />
           <div className="absolute bottom-8 left-8 max-w-[320px] rounded-2xl bg-white px-5 py-4 text-[#19212D] shadow-[0_16px_40px_rgba(0,0,0,0.3)]">
