@@ -17,7 +17,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
  * verzoek van Job) — ThemeToggle.tsx valt zonder opgeslagen voorkeur toch al
  * terug op "systeem", dus dat blijft het effectieve gedrag. Logo wordt op
  * mobiel vervangen door het compactere icoon (dezelfde afbeelding als de
- * favicon) in plaats van de volledige wordmark.
+ * favicon) in plaats van de volledige wordmark. De CTA-knop wordt op mobiel
+ * ook ingekort ("Gesprek" i.p.v. "Plan een gesprek", met minder padding) en
+ * de balk zelf iets smaller (minder gap/padding) — anders past de balk niet
+ * op één regel op een smalle telefoon.
  */
 export function SiteHeader() {
   return (
@@ -25,8 +28,8 @@ export function SiteHeader() {
       className="fixed inset-x-4 top-4 z-50 mx-auto max-w-290 rounded-2xl border border-border bg-background/92 shadow-lg shadow-black/4 backdrop-blur-sm sm:inset-x-6"
       style={{ fontFamily: "var(--font-ibm-plex-sans), Arial, sans-serif" }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3.5 px-5 py-3.5">
-        <Link href="/" className="flex items-center">
+      <div className="flex flex-nowrap items-center justify-between gap-2 px-3.5 py-3 sm:gap-3.5 sm:px-5 sm:py-3.5">
+        <Link href="/" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- lokaal logo */}
           <img
             src="/img/logo-appwizer.png"
@@ -40,27 +43,35 @@ export function SiteHeader() {
             className="block h-7 w-7 sm:hidden"
           />
         </Link>
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+        <div className="flex min-w-0 flex-nowrap items-center gap-2 sm:gap-6">
           <Link
             href="/#werkwijze"
-            className="text-[15px] font-medium text-muted-foreground no-underline hover:text-foreground"
+            className="truncate text-[13px] font-medium text-muted-foreground no-underline hover:text-foreground sm:text-[15px]"
           >
             Werkwijze
           </Link>
           <Link
             href="/#software"
-            className="text-[15px] font-medium text-muted-foreground no-underline hover:text-foreground"
+            className="truncate text-[13px] font-medium text-muted-foreground no-underline hover:text-foreground sm:text-[15px]"
           >
             Applicaties
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <div className="hidden sm:block">
               <ThemeToggle />
             </div>
-            <CalBookingLink
-              label="Plan een gesprek"
-              className="rounded-full bg-appwizer-orange px-5.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
-            />
+            <div className="hidden sm:block">
+              <CalBookingLink
+                label="Plan een gesprek"
+                className="rounded-full bg-appwizer-orange px-5.5 py-2.5 text-[14.5px] font-semibold text-white transition hover:brightness-110"
+              />
+            </div>
+            <div className="sm:hidden">
+              <CalBookingLink
+                label="Gesprek"
+                className="rounded-full bg-appwizer-orange px-3.5 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
+              />
+            </div>
           </div>
         </div>
       </div>
