@@ -19,7 +19,7 @@ const PILLARS = [
  * CalBookingLink (Cal.com-embed) als de knop in SiteHeader, i.p.v. een anker
  * naar #gesprek — direct de boekingspopup openen past beter bij de intentie
  * van die knoptekst dan naar de pagina-CTA scrollen. De kaart toont nu puur
- * een illustratie (door Job aangeleverd, public/img/appwizer-ai-werkwijze.svg)
+ * een illustratie (door Job aangeleverd, public/img/appwizer-ai-werkwijze-animatie.svg, een geanimeerde SVG die via <img> gewoon afspeelt)
  * zonder eigen titel erboven, i.p.v. de eerdere
  * 4-stappenlijst met AI-doet/wij-doen-kolommen.
  */
@@ -66,7 +66,7 @@ export function HeroSlideAI() {
         <div className="hidden w-full max-w-[480px] flex-none rounded-3xl border border-[#234159] bg-[#1C3C56] px-7 py-7 lg:block">
           {/* eslint-disable-next-line @next/next/no-img-element -- vast illustratiebestand, geen externe bron */}
           <img
-            src="/img/appwizer-ai-werkwijze.svg"
+            src="/img/appwizer-ai-werkwijze-animatie.svg"
             alt="Documenten gaan via AI naar je boekhoudsoftware, uitzonderingen worden opgelost en het systeem leert mee"
             className="w-full rounded-2xl"
           />

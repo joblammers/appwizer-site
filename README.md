@@ -1,99 +1,117 @@
-# Quickscan-module voor appwizer.com
+# appwizer.com
 
-Twee quickscans — één voor accountants- en administratiekantoren, één voor
-middelgrote MKB-organisaties — als Next.js-module. Geen ScoreApp, geen externe
-dienst. Een database is optioneel: zonder database werkt alles precies zoals
-hieronder beschreven, met de scaninhoud vast in `src/lib/quickscan/scans/*.ts`;
-mét database (zie [Admin-paneel](#admin-paneel-optioneel)) kun je diezelfde
-inhoud via een webinterface bewerken.
+De marketingsite van AppWizer (Next.js 16, App Router, Tailwind 4, Neon/Postgres)
+met daarin:
+
+- **Homepage** (`/`) — hero-carousel, systemen, werkwijze, klantcases en
+  AI-projecten.
+- **Quickscans** (`/mkb`, `/accountancy`) — twee scans, één voor accountants-
+  en administratiekantoren, één voor middelgrote MKB-organisaties. Geen
+  ScoreApp, geen externe dienst.
+- **Financial MCP Hub** (`/mcp`) — aanmeldpagina voor de Exact Online- en
+  Twinfield-connectors voor Claude.
+- **Juridische pagina's** — `/algemene-voorwaarden`, `/privacyverklaring`.
+- **Admin** (`/admin`) — scans bewerken, leads bekijken, klantcases beheren,
+  MCP-tenants goedkeuren.
+
+Een database is optioneel voor de scans: zonder database werkt alles met de
+scaninhoud vast in `src/lib/quickscan/scans/*.ts`; mét database (zie
+[Admin-paneel](#admin-paneel)) kun je diezelfde inhoud via een webinterface
+bewerken. Cases en MCP-tenants vereisen wél een database.
 
 Responsive vanaf ~375px breed, met een licht/donker/systeem-themaschakelaar
-rechtsboven op elke pagina (`src/components/ThemeToggle.tsx`).
+(`src/components/ThemeToggle.tsx`). Merkkleuren (`appwizer-orange`,
+`appwizer-blue`) en thematokens staan in `src/app/globals.css` (`@theme`).
 
-## Wat erin zit
+## Ontwikkelen
+
+```
+npm install
+cp .env.example .env.local   # vul in wat je nodig hebt
+npm run dev
+```
+
+CI (`.github/workflows/ci.yml`) draait `npx tsc --noEmit`, `npm run lint` en
+`npm run build` op elke PR en push naar `main`. De build mag niet van geheimen
+afhangen. `shots/` bevat verificatiescreenshots uit eerdere UI-controles (geen
+onderdeel van de app).
+
+> Next.js 16 wijkt af van oudere versies (o.a. `src/proxy.ts` i.p.v.
+> `middleware.ts`). Lees `node_modules/next/dist/docs/` voor je iets
+> framework-specifieks wijzigt — zie `AGENTS.md`.
+
+## Structuur
 
 ```
 src/
+├── proxy.ts                         Sessiecheck voor /admin/* (voorheen middleware)
+├── hooks/useInViewOnce.ts           Eenmalige in-view-trigger voor animaties
 ├── lib/
 │   ├── db.ts                        Neon/Postgres-client (null als DATABASE_URL ontbreekt)
+│   ├── seo.ts                       Gedeelde openGraph/twitter-basisvelden
+│   ├── cases.ts                     Klantcases + AI-projecten (tabel, CRUD, normalizeDomain)
+│   ├── mcp-db.ts                    mcp_*-tabellen (tenants, tokens, OAuth, cache)
+│   ├── mcp-kv-tenants.ts            Echte MCP-aanmeldingen uit kv_store (door eol.appwizer.com geschreven)
 │   ├── admin/auth.ts                Wachtwoordcontrole + sessiecookie voor /admin
 │   └── quickscan/
 │       ├── types.ts                 Alle typen (Scan, Question, Tier, ScanResult)
-│       ├── scoring.ts                Scorelogica — gedeeld door client en server
+│       ├── scoring.ts               Scorelogica — gedeeld door client en server
 │       ├── validate.ts              Regels uit "Een scan aanpassen" als functie
-│       ├── leads.ts                 saveLead() (alleen complete scans) + getLeadStatsByScan() voor /admin
+│       ├── leads.ts                 saveLead() (alleen complete scans) + statistieken voor /admin
 │       ├── resultLink.ts            Antwoorden coderen in een URL — voor de link in de rapport-mail
-│       └── scans/
-│           ├── accountancy.ts       24 vragen + teksten, accountancyvariant
-│           ├── mkb.ts               24 vragen + teksten, MKB-variant
-│           ├── store.ts             getScans/saveScan/deleteScan — database met fallback
-│           └── index.ts             Re-exports
+│       └── scans/                   accountancy.ts, mkb.ts (24 vragen elk), store.ts (database met fallback), index.ts
 ├── components/
-│   ├── ThemeToggle.tsx              Licht/donker/systeem, rechtsboven op elke pagina
-│   ├── Modal.tsx                    Gedeelde popup (backdrop, Escape, sluitknop) — alleen nog voor de chart-zoom
+│   ├── ThemeToggle.tsx, Modal.tsx, QuickscanModalButton.tsx
 │   ├── CalBookingLink.tsx           Knop die Cal.com's boekingspopup opent (element-click embed)
-│   ├── admin/
-│   │   ├── ScanList.tsx             Scanoverzicht in /admin
-│   │   ├── ScanEditor.tsx           Volledige scan-editor (categorieën, vragen, niveaus, JSON)
-│   │   ├── LeadOverview.tsx         Alle scans in één overzicht: staafdiagram + tabel met scan/bedrijf/categorieën
-│   │   ├── ScanScoreChart.tsx       Gemiddelde totaalscore per scan, één balk per scan (SVG, geen library)
-│   │   └── LeadDetail.tsx           Eén ingevulde scan ("entered scan"): score, spiderweb, antwoorddrill-down, profiel
-│   └── quickscan/
-│       ├── ScanRunner.tsx           Vraagflow, voortgang, fases, introscherm (tekst + optionele afbeelding)
-│       ├── IntroContent.tsx         Lichte opmaak voor de intro: alinea's + opsommingslijsten
-│       ├── LeadForm.tsx             Leadformulier met validatie
-│       ├── ScanResult.tsx           Uitslag: score, spiderweb, balken met drill-down per vraag, niveau, CTA
-│       └── CategoryRadarChart.tsx   Spiderweb-diagram van de score per categorie (SVG, geen library)
+│   ├── site/                        Header, footer, HeroCarousel + hero-slides/, SystemsGrid, AiProjectsGrid, WorkflowSteps, QuickscanDropdown
+│   ├── quickscan/                   ScanRunner (fases), IntroContent, LeadForm, ScanResult, CategoryRadarChart, ScoreBadge, ScoreThermometer
+│   └── admin/                       AdminTabs, ScanList/ScanEditor, LeadOverview/LeadTable/LeadDetail, ScanScoreChart, CaseList, McpTenantList
 └── app/
-    ├── admin/
-    │   ├── login/page.tsx           Wachtwoordformulier
-    │   ├── actions.ts               Server actions: opslaan/aanmaken/verwijderen
-    │   └── (protected)/             Lijst (page.tsx) + scan-editor ([slug]/page.tsx) + ingevulde scan (leads/[id]/page.tsx)
-    ├── page.tsx                     Keuzepagina met beide scans, op "/"
-    ├── [slug]/page.tsx              /mkb en /accountancy
-    └── api/quickscan/lead/route.ts  Leadverwerking
+    ├── layout.tsx, globals.css, robots.ts, sitemap.ts
+    ├── (site)/                      Routegroep met site-layout (header/footer)
+    │   ├── page.tsx                 Homepage
+    │   ├── [slug]/page.tsx          /mkb en /accountancy
+    │   ├── mcp/page.tsx             Financial MCP Hub
+    │   ├── algemene-voorwaarden/, privacyverklaring/
+    │   └── admin/
+    │       ├── login/page.tsx       Wachtwoordformulier
+    │       ├── actions.ts           Server actions voor scans
+    │       ├── case-actions.ts      Server actions voor cases
+    │       ├── mcp-actions.ts       Goedkeuren/pauzeren/verwijderen van MCP-tenants
+    │       └── (protected)/         Overzicht, scan-editor ([slug]), leads/[id], tenants, tenants/[slug]
+    └── api/quickscan/lead/          route.ts (leadverwerking) + start/route.ts
 ```
 
-De module draait op een eigen (sub)domein — bijvoorbeeld `quickscan.appwizer.com` —
-zonder WordPress ervoor. `next.config.ts`'s `WORDPRESS_ORIGIN`-fallback is dus
-optioneel: laat hem leeg als er geen bestaande site achter dit domein hoeft
-door te schemeren.
+## Omgevingsvariabelen
 
-## Installeren in een bestaand Next.js-project
+Zie `.env.example` voor de volledige lijst en toelichting. Alles is optioneel;
+zonder een variabele valt de bijbehorende functie weg in plaats van te falen.
 
-1. Kopieer de map `src/` over je eigen `src/` heen (of pas de importpaden aan
-   als je geen `src`-directory gebruikt).
-2. Zorg dat het alias `@/*` naar `./src/*` wijst in `tsconfig.json`.
-3. Voeg de merkkleuren toe aan `tailwind.config.ts`:
+| Variabele | Doel |
+| --- | --- |
+| `DATABASE_URL` (of `POSTGRES_URL`) | Neon/Postgres: scans, leads, cases, MCP-tenants |
+| `ADMIN_PASSWORD` | Het ene gedeelde wachtwoord voor `/admin` |
+| `QUICKSCAN_WEBHOOK_URL` | Webhook (Zapier/Make/HubSpot) per ingevulde scan |
+| `RESEND_API_KEY`, `QUICKSCAN_NOTIFY_EMAIL`, `QUICKSCAN_FROM_EMAIL` | Mails via Resend (rapport, notificatie, tenant-mails) |
+| `WORDPRESS_ORIGIN` | Fallback-proxy naar de bestaande WordPress-site (niet `appwizer.com` zelf) |
+| `EXACT_MCP_URL`, `TWINFIELD_MCP_URL` | Productie-URL's van de losse MCP-apps; zet de `/mcp/*`- en `mcp.appwizer.com`-rewrites |
 
-```ts
-theme: {
-  extend: {
-    colors: {
-      "appwizer-orange": "#DF7D3C",
-      "appwizer-blue": "#5C94CD",
-    },
-  },
-}
-```
+Zet dezelfde variabelen in Vercel onder Settings > Environment Variables en
+commit `.env.local` nooit.
 
-4. Zet de omgevingsvariabelen (allemaal optioneel — zonder deze werkt de scan,
-   alleen komt de lead dan nergens aan en is er geen admin-paneel):
+## Routing en proxy (`next.config.js`)
 
-```
-QUICKSCAN_WEBHOOK_URL=https://hooks.zapier.com/...
-RESEND_API_KEY=re_...
-QUICKSCAN_NOTIFY_EMAIL=job@appwizer.com
-QUICKSCAN_FROM_EMAIL=scan@appwizer.com
+- **WordPress-fallback:** alleen paden waarvoor Next.js geen eigen route heeft
+  gaan naar `WORDPRESS_ORIGIN`. Een pagina naar Next.js verplaatsen is dus
+  genoeg; `/wp-admin` en `/wp-login.php` redirecten rechtstreeks naar de origin.
+- **MCP-rewrites:** `/mcp/exact/*` en `/mcp/twinfield/*` gaan naar de losse
+  MCP-apps; voor `Host: mcp.appwizer.com` (oud mcp-hub-domein) blijven de oude
+  paden werken. Bestemmingen zijn altijd volledige externe URL's — Next.js
+  evalueert een al-gepasseerde rewrite niet opnieuw.
+- **Headers:** security-headers overal; preview-deployments krijgen
+  `X-Robots-Tag: noindex`.
 
-# Admin-paneel — zie "Admin-paneel (optioneel)" hieronder
-ADMIN_PASSWORD=
-DATABASE_URL=
-```
-
-5. `npm run dev` en ga naar `/`.
-
-## Admin-paneel (optioneel)
+## Admin-paneel
 
 Op `/admin` kun je categorieën, vragen, profielvragen en niveaus per scan
 bewerken via een webinterface, of een hele scan als JSON downloaden/uploaden —
@@ -122,7 +140,7 @@ statisch voorgerenderd): een wijziging in `/admin` is direct zichtbaar op de
 site, zonder redeploy.
 
 Beveiliging: `src/proxy.ts` blokkeert onbevoegde navigatie naar `/admin/*`, en
-elke server action in `src/app/admin/actions.ts` controleert de sessie
+elke server action in `src/app/(site)/admin/actions.ts` controleert de sessie
 nogmaals zelf — Server Functions zijn ook als directe POST-aanroep bereikbaar,
 niet alleen via de UI.
 
@@ -274,10 +292,9 @@ ook via "Dupliceer als nieuwe scan" op `/admin`.
   na inzending. De rest van een drip-campagne hoort thuis in je
   e-mailplatform; de API-route zet de lead met score en niveau door zodat je
   daarop kunt segmenteren.
-- **Benchmark.** Complete leads (antwoorden + uitslag) staan sinds kort in
-  `quickscan_leads` als `DATABASE_URL` gezet is (zie
-  `src/lib/quickscan/leads.ts` — dezelfde database als de scaninhoud, zie
-  [Admin-paneel](#admin-paneel-optioneel)). Er is alleen nog geen viewer voor
-  die tabel en geen benchmarklogica: de uitslagpagina toont nog niet hoe
-  iemand scoort ten opzichte van vergelijkbare organisaties, dat is de
-  volgende stap zodra er genoeg leads binnen zijn.
+- **Uitgebreidere benchmark.** Complete leads staan in `quickscan_leads` als
+  `DATABASE_URL` gezet is (`src/lib/quickscan/leads.ts`). `/admin` toont ze in
+  `LeadOverview`/`LeadTable`/`LeadDetail`, en de uitslag toont de gemiddelde
+  categoriescore van eerdere deelnemers (`getCategoryAverages` → `peerScores`
+  in het spiderweb). Een vergelijking op segment (sector, omvang) ontbreekt
+  nog.

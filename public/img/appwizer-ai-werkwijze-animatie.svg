@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="860" viewBox="0 0 500 430" role="img" aria-label="Animatie: documenten gaan via AI naar je boekhoudsoftware, uitzonderingen worden opgelost en het systeem leert mee">
+  <rect width="500" height="430" rx="24" fill="#121E36"/>
+
+  <!-- Lijnen van documenten naar de AI-kern -->
+  <g fill="none" stroke="#3A5F8A" stroke-width="2" stroke-linecap="round">
+    <path d="M134 115 C170 115 160 215 198 215" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" values="1;1;0;0" keyTimes="0;.2083;.4583;1" dur="2.4s" begin="0s" fill="freeze"/>
+    </path>
+    <path d="M134 215 H198" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" values="1;1;0;0" keyTimes="0;.25;.5;1" dur="2.4s" begin="0s" fill="freeze"/>
+    </path>
+    <path d="M134 315 C170 315 160 215 198 215" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" values="1;1;0;0" keyTimes="0;.2917;.5417;1" dur="2.4s" begin="0s" fill="freeze"/>
+    </path>
+  </g>
+
+  <!-- Documenten -->
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0;.2083;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" values="-16 0;-16 0;0 0;0 0" keyTimes="0;0;.2083;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <rect x="24" y="75" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="91" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="108" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="120" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="132" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+  </g>
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;.0625;.2708;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" values="-16 0;-16 0;0 0;0 0" keyTimes="0;.0625;.2708;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <rect x="24" y="175" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="191" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="208" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="220" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="232" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+  </g>
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;.125;.3333;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" values="-16 0;-16 0;0 0;0 0" keyTimes="0;.125;.3333;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <rect x="24" y="275" width="110" height="80" rx="10" fill="#1B3350" stroke="#2C4A70"/>
+    <rect x="38" y="291" width="48" height="7" rx="3.5" fill="#A8CBEE"/>
+    <rect x="38" y="308" width="80" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="320" width="64" height="5" rx="2.5" fill="#3A5F8A"/>
+    <rect x="38" y="332" width="72" height="5" rx="2.5" fill="#3A5F8A"/>
+  </g>
+
+  <!-- AI-kern met ring en glinsteringen -->
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;.375;.5417;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <circle cx="250" cy="215" r="78" fill="none" stroke="#DF7D3C" stroke-width="2" stroke-dasharray="4 8" stroke-linecap="round">
+      <animateTransform attributeName="transform" type="rotate" from="0 250 215" to="360 250 215" dur="18s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="250" cy="215" r="52" fill="#5C94CD">
+      <animate attributeName="r" values="52;55;52" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
+    </circle>
+    <path d="M250 183 C252 204 261 213 282 215 C261 217 252 226 250 247 C248 226 239 217 218 215 C239 213 248 204 250 183 Z" fill="#0B1424"/>
+    <path d="M312 138 C313 146 316 149 324 150 C316 151 313 154 312 162 C311 154 308 151 300 150 C308 149 311 146 312 138 Z" fill="#DF7D3C">
+      <animate attributeName="opacity" values="1;.25;1" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M196 282 C196.6 286 198 287.4 202 288 C198 288.6 196.6 290 196 294 C195.4 290 194 288.6 190 288 C194 287.4 195.4 286 196 282 Z" fill="#A8CBEE">
+      <animate attributeName="opacity" values="1;.25;1" dur="2s" begin=".8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Pijl en softwarevenster -->
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;.5417;.75;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <path d="M302 215 H336" fill="none" stroke="#5C94CD" stroke-width="2" stroke-linecap="round"/>
+    <path d="M346 215 L335 208 L335 222 Z" fill="#5C94CD"/>
+    <rect x="346" y="95" width="130" height="240" rx="14" fill="#FFFFFF"/>
+    <path d="M346 109 a14 14 0 0 1 14 -14 H462 a14 14 0 0 1 14 14 V123 H346 Z" fill="#E4EEF8"/>
+    <circle cx="362" cy="109" r="4" fill="#DF7D3C"/>
+    <circle cx="376" cy="109" r="4" fill="#A8CBEE"/>
+    <circle cx="390" cy="109" r="4" fill="#5C94CD"/>
+
+    <circle cx="366" cy="157" r="10" fill="#5C94CD"/>
+    <path d="M361.5 157 L365 160.5 L371 153.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="153" width="72" height="8" rx="4" fill="#C9D2E4"/>
+    <circle cx="366" cy="199" r="10" fill="#5C94CD"/>
+    <path d="M361.5 199 L365 202.5 L371 195.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="195" width="60" height="8" rx="4" fill="#C9D2E4"/>
+    <circle cx="366" cy="283" r="10" fill="#5C94CD"/>
+    <path d="M361.5 283 L365 286.5 L371 279.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="386" y="279" width="64" height="8" rx="4" fill="#C9D2E4"/>
+
+    <!-- Uitzondering die wordt opgelost, herhaalt elke 8 seconden -->
+    <rect x="386" y="237" width="68" height="8" rx="4" fill="#F4D3BB">
+      <animate attributeName="fill" values="#F4D3BB;#F4D3BB;#F4D3BB;#C9D2E4;#C9D2E4;#F4D3BB" keyTimes="0;.3;.34;.375;.95;1" dur="8s" repeatCount="indefinite"/>
+    </rect>
+    <g>
+      <animate attributeName="opacity" values="1;1;.5;0;0;1" keyTimes="0;.3;.34;.375;.95;1" dur="8s" repeatCount="indefinite"/>
+      <circle cx="366" cy="241" r="10" fill="#DF7D3C"/>
+      <rect x="364.8" y="234.5" width="2.4" height="8" rx="1.2" fill="#0B1424"/>
+      <circle cx="366" cy="246.5" r="1.4" fill="#0B1424"/>
+    </g>
+    <g transform="translate(366 241)">
+      <g opacity="0">
+        <animate attributeName="opacity" values="0;0;1;1;1;0" keyTimes="0;.3;.34;.375;.95;1" dur="8s" repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" type="scale" values="0.3;0.3;1.2;1;1;0.3" keyTimes="0;.3;.34;.375;.95;1" dur="8s" repeatCount="indefinite"/>
+        <circle cx="0" cy="0" r="10" fill="#5C94CD"/>
+        <path d="M-4.5 0 L-1 3.5 L5 -3.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Lus "leert mee" -->
+  <g>
+    <animate attributeName="opacity" values="0;0;1;1" keyTimes="0;.75;.9583;1" dur="2.4s" begin="0s" fill="freeze"/>
+    <path d="M411 339 V392 H79 V369" fill="none" stroke="#DF7D3C" stroke-width="2" stroke-dasharray="6 6" stroke-linecap="round" stroke-linejoin="round">
+      <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M79 357 L72 369 L86 369 Z" fill="#DF7D3C"/>
+    <rect x="190" y="377" width="110" height="30" rx="15" fill="#121E36"/>
+    <text x="245" y="397" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="600" fill="#A8CBEE">leert mee</text>
+  </g>
+
+  <!-- Stippen die van documenten naar de kern en naar de software reizen -->
+  <circle cx="0" cy="0" r="4.5" fill="#DF7D3C" opacity="0">
+    <animateMotion path="M134 115 C170 115 160 215 198 215" dur="2.2s" begin="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="2.2s" begin="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="0" cy="0" r="4.5" fill="#DF7D3C" opacity="0">
+    <animateMotion path="M134 215 H198" dur="2.2s" begin="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="2.2s" begin="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="0" cy="0" r="4.5" fill="#DF7D3C" opacity="0">
+    <animateMotion path="M134 315 C170 315 160 215 198 215" dur="2.2s" begin="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="2.2s" begin="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="0" cy="0" r="4.5" fill="#DF7D3C" opacity="0">
+    <animateMotion path="M302 215 H336" dur="1.1s" begin="2.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.9;1" dur="1.1s" begin="2.6s" repeatCount="indefinite"/>
+  </circle>
+</svg>
