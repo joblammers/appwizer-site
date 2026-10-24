@@ -20,12 +20,14 @@ const EMPTY_FORM: FormValues = {
   descriptionEn: "",
   applications: [],
   domain: "",
+  category: "client",
 };
 
 export function CaseList({ cases }: Props) {
   const [adding, setAdding] = useState(false);
   const [clientFilter, setClientFilter] = useState("");
   const [applicationFilter, setApplicationFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
   const applications = useMemo(
     () => Array.from(new Set(cases.flatMap((c) => c.applications))).sort((a, b) => a.localeCompare(b)),
@@ -35,7 +37,8 @@ export function CaseList({ cases }: Props) {
   const filtered = cases.filter((c) => {
     const matchesClient = c.client.toLowerCase().includes(clientFilter.trim().toLowerCase());
     const matchesApplication = !applicationFilter || c.applications.includes(applicationFilter);
-    return matchesClient && matchesApplication;
+    const matchesCategory = !categoryFilter || c.category === categoryFilter;
+    return matchesClient && matchesApplication && matchesCategory;
   });
 
   return (
@@ -64,6 +67,18 @@ export function CaseList({ cases }: Props) {
                 {app}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="block flex-1 text-sm">
+          <span className="mb-1 block font-medium text-foreground">Filter op type</span>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-appwizer-orange focus:outline-none"
+          >
+            <option value="">Alles</option>
+            <option value="client">Klantcases</option>
+            <option value="ai">AI-projecten</option>
           </select>
         </label>
       </div>
@@ -127,9 +142,16 @@ function CaseRow({ clientCase }: { clientCase: ClientCase }) {
     <div className="rounded-xl border border-border bg-surface p-5">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
-            {clientCase.sector}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold uppercase tracking-widest text-appwizer-blue">
+              {clientCase.sector}
+            </p>
+            {clientCase.category === "ai" && (
+              <span className="rounded-full bg-appwizer-orange/10 px-2 py-0.5 text-xs font-medium text-appwizer-orange">
+                AI-project
+              </span>
+            )}
+          </div>
           <p className="text-lg font-semibold text-foreground">{clientCase.client}</p>
           <p className="text-sm text-muted-foreground">
             {clientCase.location} · {clientCase.period} · {clientCase.duration}
@@ -209,6 +231,19 @@ function CaseForm({
   return (
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block text-sm">
+          <span className="mb-1 block font-medium text-foreground">Type</span>
+          <select
+            value={values.category}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, category: e.target.value === "ai" ? "ai" : "client" }))
+            }
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-appwizer-orange focus:outline-none"
+          >
+            <option value="client">Klantcase</option>
+            <option value="ai">AI-project</option>
+          </select>
+        </label>
         <LabeledInput label="Klant" {...field("client")} />
         <LabeledInput label="Plaats" {...field("location")} />
         <LabeledInput label="Periode" {...field("period")} placeholder="2026 – heden" />

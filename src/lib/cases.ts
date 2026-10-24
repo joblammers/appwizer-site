@@ -13,6 +13,8 @@ export interface ClientCase {
   applications: string[];
   /** Kaal domein (bv. "optiver.com") voor het ophalen van het klantlogo via een logo-service; leeg = initialen-badge. */
   domain: string;
+  /** "client" = echte klantcase (Klantcases-popup per systeem); "ai" = AI-optimalisatieproject (eigen homepage-sectie, nooit in de systeem-popups). */
+  category: "client" | "ai";
 }
 
 /** Haalt een geplakte URL terug naar een kaal domein ("https://www.kruitbosch.nl/" -> "kruitbosch.nl") — mensen plakken nu eenmaal de hele adresbalk, niet alleen het domein. */
@@ -45,6 +47,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
     descriptionEn: "Supporting the team towards the Oracle NetSuite go-live.",
     applications: ["Oracle NetSuite"],
     domain: "",
+    category: "client",
   },
   {
     client: "Corlido Group",
@@ -58,6 +61,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Optimising internal processes and supporting the international rollout to local subsidiaries. Built a reporting pack for margin, cost and revenue analysis.",
     applications: ["Oracle NetSuite"],
     domain: "",
+    category: "client",
   },
   {
     client: "Optiver",
@@ -71,6 +75,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Holiday cover for team support and SuiteScript development at an international market making firm.",
     applications: ["Oracle NetSuite", "SuiteScript"],
     domain: "optiver.com",
+    category: "client",
   },
   {
     client: "Huisartsenzorg Twente",
@@ -84,6 +89,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Optimising administrative processes in Twinfield and Basecone, including imports and reporting from external applications.",
     applications: ["Twinfield", "Basecone"],
     domain: "",
+    category: "client",
   },
   {
     client: "Eqeep",
@@ -97,6 +103,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Process optimisation in NetSuite. Developed an approval module, automated journal postings and sales invoices with timesheets attached (SuiteScript).",
     applications: ["Oracle NetSuite", "SuiteScript"],
     domain: "",
+    category: "client",
   },
   {
     client: "De Projectgroep",
@@ -108,6 +115,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
     descriptionEn: "Data migration from Oracle NetSuite to AFAS.",
     applications: ["Oracle NetSuite", "AFAS"],
     domain: "",
+    category: "client",
   },
   {
     client: "Optiver",
@@ -121,6 +129,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Wrote a finance handbook defining the services and responsibilities of the internal support team. Updated technical documentation and business processes.",
     applications: ["Oracle NetSuite"],
     domain: "optiver.com",
+    category: "client",
   },
   {
     client: "VIP Calculus",
@@ -134,6 +143,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Optimising internal administrative processes for GP support organisation VIPLive.",
     applications: [],
     domain: "",
+    category: "client",
   },
   {
     client: "Impact Institute",
@@ -146,6 +156,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
     descriptionEn: "Renewed the financial application landscape for an international scale-up.",
     applications: [],
     domain: "",
+    category: "client",
   },
   {
     client: "Steltix",
@@ -158,6 +169,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
     descriptionEn: "Hands-on Oracle NetSuite support for an international consultancy firm.",
     applications: ["Oracle NetSuite"],
     domain: "",
+    category: "client",
   },
   {
     client: "MN Services",
@@ -171,6 +183,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Migrated CODA Financials to the cloud. Functional and technical specifications to convert on-premises interfaces (CSV, SQL, XML) to the CODA Cloud API on AWS, including test and run manuals.",
     applications: ["CODA Financials", "CODA Cloud API", "AWS"],
     domain: "",
+    category: "client",
   },
   {
     client: "Ewals Cargo Care",
@@ -184,6 +197,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Training and support for the international NetSuite implementation: purchase-to-pay, order-to-cash, bank reconciliation and invoice matching.",
     applications: ["Oracle NetSuite"],
     domain: "ewals.com",
+    category: "client",
   },
   {
     client: "Van Oers Accounting / VO Accountants",
@@ -197,6 +211,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Helping accountancy clients streamline their administration with integrated applications for invoice scanning and processing, POS integrations and management reporting.",
     applications: [],
     domain: "",
+    category: "client",
   },
   {
     client: "Crack",
@@ -210,6 +225,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Training and support for the international NetSuite implementation: warehouse, contracts, subscription billing, bank reconciliation and invoice matching. Ongoing monthly subscription billing support.",
     applications: ["Oracle NetSuite (SuiteBilling)"],
     domain: "",
+    category: "client",
   },
   {
     client: "Human Business Support",
@@ -223,6 +239,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Process mapping and requirements for a healthcare contracting organisation. Implemented the accounting and time & expense applications.",
     applications: [],
     domain: "",
+    category: "client",
   },
   {
     client: "Van Oers Accounting",
@@ -236,6 +253,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Process mapping and NetSuite implementation for two entities of a global fast-food chain. Purchase invoices registered per restaurant, with one consolidated sales invoice per restaurant including all purchase invoices.",
     applications: ["Oracle NetSuite"],
     domain: "",
+    category: "client",
   },
   {
     client: "Clafis",
@@ -249,6 +267,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Process analysis and requirements to replace legacy applications. Selected and presented alternatives, followed by project management, implementation and data migration.",
     applications: ["Oracle NetSuite", "Simplicate"],
     domain: "",
+    category: "client",
   },
   {
     client: "KplusV",
@@ -262,6 +281,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Supported the finance department in migrating to Exact Online and Simplicate time registration.",
     applications: ["Exact Online", "Simplicate"],
     domain: "",
+    category: "client",
   },
   {
     client: "Entropia",
@@ -275,6 +295,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Implemented Exact Online with warehouses in Belgium and the Netherlands, including subscription billing of leased equipment.",
     applications: ["Exact Online"],
     domain: "",
+    category: "client",
   },
   {
     client: "Van Oers Accounting",
@@ -288,6 +309,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "NetSuite implementation for the Dutch division of a global fast-food chain: marketing spend, central purchasing and invoicing to franchisees. Also coached the firm in setting up a central outsourcing team.",
     applications: ["Oracle NetSuite (SuiteBilling)"],
     domain: "",
+    category: "client",
   },
   {
     client: "De Nieuwe Zorg (DNZ)",
@@ -301,6 +323,7 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Process analysis and implementation of central accounting and time tracking for 100 sole traders, including invoicing. Built a Power BI report combining invoices, logged hours and missing hours.",
     applications: ["Power BI"],
     domain: "",
+    category: "client",
   },
   {
     client: "Inseego",
@@ -314,6 +337,81 @@ const DEFAULT_CASES: Omit<ClientCase, "id">[] = [
       "Supported the international NetSuite rollout for the Benelux team: order-to-cash including sales orders, fulfilment, subscription billing of serialised items, direct debits and bank reconciliation.",
     applications: ["Oracle NetSuite (SuiteBilling)"],
     domain: "inseego.com",
+    category: "client",
+  },
+  {
+    client: "Vereenvoudigd inkoopproces",
+    location: "Horeca",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl: "Vereenvoudiging van het inkoopproces bij een horecagelegenheid.",
+    descriptionEn: "Simplified the purchasing process at a hospitality venue.",
+    applications: [],
+    domain: "",
+    category: "ai",
+  },
+  {
+    client: "Auditfiles verwerken",
+    location: "Diverse klanten",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl:
+      "Verwerking van auditfiles naar kant-en-klare boekingen in Twinfield, Exact Online en Moneybird.",
+    descriptionEn:
+      "Processed audit files into ready-to-book entries for Twinfield, Exact Online and Moneybird.",
+    applications: [],
+    domain: "",
+    category: "ai",
+  },
+  {
+    client: "Managementrapportage",
+    location: "Diverse klanten",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl: "Synchronisatie van een rapportagedatabase voor Power BI en Microsoft Fabric.",
+    descriptionEn: "Synchronised a reporting database for Power BI and Microsoft Fabric.",
+    applications: [],
+    domain: "",
+    category: "ai",
+  },
+  {
+    client: "NetSuite-optimalisatiescripts (Eqeep)",
+    location: "Utrecht",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl: "Scripts voor OHW-boekingen in de projectadministratie bij Eqeep.",
+    descriptionEn: "Scripts for WIP postings in project accounting at Eqeep.",
+    applications: [],
+    domain: "",
+    category: "ai",
+  },
+  {
+    client: "Automatische margebepaling (Corlido)",
+    location: "Emmen",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl: "Automatische berekening van marges per order bij Corlido Group.",
+    descriptionEn: "Automatic margin calculation per order at Corlido Group.",
+    applications: [],
+    domain: "",
+    category: "ai",
+  },
+  {
+    client: "Klantspecifieke pakbonnen (Kruitbosch)",
+    location: "Zwolle",
+    period: "2024",
+    duration: "Project",
+    sector: "AI-project",
+    descriptionNl: "Gegenereerde pakbonnen op maat voor dropshipments bij Kruitbosch.",
+    descriptionEn: "Generated custom packing slips for dropshipments at Kruitbosch.",
+    applications: [],
+    domain: "",
+    category: "ai",
   },
 ];
 
@@ -338,6 +436,7 @@ async function bootstrap(): Promise<void> {
         )
       `;
       await sql`alter table client_cases add column if not exists domain text not null default ''`;
+      await sql`alter table client_cases add column if not exists category text not null default 'client'`;
       /**
        * Voorkomt dubbele seed-rijen: zonder dit kunnen twee gelijktijdige
        * cold starts (elk met hun eigen in-memory `bootstrapped`-guard) allebei
@@ -363,10 +462,10 @@ async function bootstrap(): Promise<void> {
         await sql`
           insert into client_cases (
             client, location, period, duration, sector,
-            description_nl, description_en, applications, domain
+            description_nl, description_en, applications, domain, category
           ) values (
             ${c.client}, ${c.location}, ${c.period}, ${c.duration}, ${c.sector},
-            ${c.descriptionNl}, ${c.descriptionEn}, ${JSON.stringify(c.applications)}::jsonb, ${c.domain}
+            ${c.descriptionNl}, ${c.descriptionEn}, ${JSON.stringify(c.applications)}::jsonb, ${c.domain}, ${c.category}
           )
           on conflict (client, period) do nothing
         `;
@@ -388,7 +487,7 @@ export async function getAllCases(): Promise<ClientCase[]> {
     await bootstrap();
     const rows = (await sql`
       select id, client, location, period, duration, sector,
-        description_nl, description_en, applications, domain
+        description_nl, description_en, applications, domain, category
       from client_cases
     `) as {
       id: number;
@@ -401,6 +500,7 @@ export async function getAllCases(): Promise<ClientCase[]> {
       description_en: string;
       applications: string[];
       domain: string;
+      category: string;
     }[];
     return rows
       .map((row) => ({
@@ -414,6 +514,7 @@ export async function getAllCases(): Promise<ClientCase[]> {
         descriptionEn: row.description_en,
         applications: row.applications ?? [],
         domain: row.domain ?? "",
+        category: row.category === "ai" ? ("ai" as const) : ("client" as const),
       }))
       .sort((a, b) => startYear(b.period) - startYear(a.period));
   } catch (error) {
@@ -441,10 +542,10 @@ export async function createCase(input: Omit<ClientCase, "id">): Promise<void> {
   await sql`
     insert into client_cases (
       client, location, period, duration, sector,
-      description_nl, description_en, applications, domain
+      description_nl, description_en, applications, domain, category
     ) values (
       ${input.client}, ${input.location}, ${input.period}, ${input.duration}, ${input.sector},
-      ${input.descriptionNl}, ${input.descriptionEn}, ${JSON.stringify(input.applications)}::jsonb, ${input.domain}
+      ${input.descriptionNl}, ${input.descriptionEn}, ${JSON.stringify(input.applications)}::jsonb, ${input.domain}, ${input.category}
     )
   `;
 }
@@ -462,7 +563,8 @@ export async function updateCase(id: number, input: Omit<ClientCase, "id">): Pro
       description_nl = ${input.descriptionNl},
       description_en = ${input.descriptionEn},
       applications = ${JSON.stringify(input.applications)}::jsonb,
-      domain = ${input.domain}
+      domain = ${input.domain},
+      category = ${input.category}
     where id = ${id}
   `;
 }
