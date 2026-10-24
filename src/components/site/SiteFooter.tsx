@@ -18,9 +18,9 @@ export function SiteFooter({ scans }: { scans: Scan[] }) {
       <div className="mx-auto grid max-w-300 grid-cols-2 gap-10 sm:grid-cols-4">
         <div className="col-span-2 sm:col-span-1">
           <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element -- extern WordPress-logo, geen lokaal domein om te registreren */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- lokaal logo */}
             <img
-              src="https://appwizer.com/wp-content/uploads/2023/04/Logo_Appwizer.png"
+              src="/logo-appwizer.png"
               alt="AppWizer"
               className="block h-6 w-auto"
             />

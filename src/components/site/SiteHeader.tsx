@@ -23,9 +23,9 @@ export function SiteHeader() {
     >
       <div className="flex flex-wrap items-center justify-between gap-3.5 px-5 py-3.5">
         <Link href="/" className="flex items-center">
-          {/* eslint-disable-next-line @next/next/no-img-element -- extern WordPress-logo, geen lokaal domein om te registreren */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- lokaal logo */}
           <img
-            src="https://appwizer.com/wp-content/uploads/2023/04/Logo_Appwizer.png"
+            src="/logo-appwizer.png"
             alt="AppWizer"
             className="block h-[26px] w-auto"
           />
