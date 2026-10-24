@@ -68,7 +68,7 @@ export function SiteHeader() {
             </div>
             <div className="sm:hidden">
               <CalBookingLink
-                label="Gesprek"
+                label="Boek afspraak"
                 className="rounded-full bg-appwizer-orange px-3.5 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
               />
             </div>
