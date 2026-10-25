@@ -23,6 +23,10 @@ jobs:
       - name: Dependencies installeren
         run: npm ci
 
+      # LayoutProps/PageProps zijn globale typen die Next.js genereert; zonder .next ontbreken ze.
+      - name: Next-types genereren
+        run: npx next typegen
+
       - name: Typecheck
         run: npx tsc --noEmit
 
