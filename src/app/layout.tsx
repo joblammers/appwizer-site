@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { IBM_Plex_Sans, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { BASE_OPEN_GRAPH, BASE_TWITTER } from "@/lib/seo";
 import "./globals.css";
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Script>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
