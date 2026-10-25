@@ -25,7 +25,7 @@ export default async function TenantsPage() {
             </tr>
           </thead>
           <tbody>
-            {tenants.map((tenant: any) => (
+            {tenants.map((tenant) => (
               <tr key={tenant.slug} className="border-t border-border hover:bg-muted/50">
                 <td className="px-4 py-2 font-mono text-sm">{tenant.slug}</td>
                 <td className="px-4 py-2">{tenant.name}</td>
@@ -44,7 +44,7 @@ export default async function TenantsPage() {
                   </span>
                 </td>
                 <td className="px-4 py-2 text-sm text-muted-foreground">
-                  {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString("nl-NL") : "-"}
+                  {tenant.createdAt ? new Date(tenant.createdAt).toLocaleDateString("nl-NL") : "-"}
                 </td>
                 <td className="px-4 py-2">
                   <Link href={`/admin/tenants/${tenant.slug}`} className="text-appwizer-orange hover:underline">
