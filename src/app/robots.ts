@@ -9,11 +9,26 @@ const SITE_URL = "https://appwizer.com";
  */
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/admin", "/api/"],
-    },
+    rules: [
+      // AI-antwoordmachines en hun zoekbots expliciet toegestaan: de site wil in antwoorden voorkomen.
+      {
+        userAgent: [
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-SearchBot",
+          "Claude-User",
+          "PerplexityBot",
+          "Perplexity-User",
+          "Google-Extended",
+          "Applebot-Extended",
+        ],
+        allow: "/",
+        disallow: ["/admin", "/api/"],
+      },
+      { userAgent: "*", allow: "/", disallow: ["/admin", "/api/"] },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { getScans } from "@/lib/quickscan/scans";
+import { JsonLd } from "@/components/JsonLd";
+import { ORGANIZATION_JSONLD } from "@/lib/structuredData";
 
 // Niet statisch cachen: welke scans er zijn (voor de footer) kan via /admin
 // wijzigen zonder redeploy.
@@ -19,6 +21,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={ORGANIZATION_JSONLD} />
       <SiteHeader />
       <div className="pt-28 sm:pt-32">{children}</div>
       <SiteFooter scans={visibleScans} />

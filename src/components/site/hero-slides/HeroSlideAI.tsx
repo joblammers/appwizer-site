@@ -31,11 +31,11 @@ export function HeroSlideAI() {
           <div className="rounded-full bg-[#1F4A66] px-4 py-2 text-sm font-semibold text-[#F3C6A2]">
             Zo werkt AppWizer: AI-first
           </div>
-          <h1 className="m-0 text-[clamp(30px,4.2vw,52px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-white">
+          <h2 className="m-0 text-[clamp(30px,4.2vw,52px)] leading-[1.1] font-extrabold tracking-[-0.03em] text-white">
             Wij zetten AI in om ons
             <br />
             werk te automatiseren.
-          </h1>
+          </h2>
           <p className="m-0 max-w-[580px] text-lg leading-[1.55] text-[#B7CBDD]">
             Jij wilt dat je administratie sneller en met minder handwerk loopt. Daarom zetten
             wij slimme automatisering in, met AI als hulpmiddel. Zo houden wij tijd over voor

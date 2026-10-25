@@ -53,6 +53,14 @@ export function SiteFooter({ scans }: { scans: Scan[] }) {
               </Link>
             </li>
             <li>
+              <Link
+                href="/mcp"
+                className="text-[14px] text-muted-foreground no-underline hover:text-appwizer-orange"
+              >
+                Financial MCP Hub
+              </Link>
+            </li>
+            <li>
               <span className="text-[14px] text-muted-foreground">Doe de Quickscan</span>
               {scans.length > 0 && (
                 <ul className="mt-2 ml-3 space-y-2 border-l border-border pl-3">

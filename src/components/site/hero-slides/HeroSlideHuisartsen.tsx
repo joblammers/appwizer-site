@@ -40,9 +40,9 @@ export function HeroSlideHuisartsen({ scan }: { scan: Scan | null }) {
           <div className="self-start rounded-full bg-[#1E3A33] px-4 py-2 text-sm font-semibold text-[#7FE3B3]">
             Het Praktijkbalans Programma
           </div>
-          <h1 className="m-0 text-[clamp(30px,4.2vw,52px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-white">
+          <h2 className="m-0 text-[clamp(30px,4.2vw,52px)] leading-[1.08] font-extrabold tracking-[-0.03em] text-white">
             Stop met administreren, begin weer met arts zijn.
-          </h1>
+          </h2>
           <p className="m-0 max-w-[520px] text-lg leading-[1.55] text-[#C5CEDC]">
             U werd huisarts om mensen te helpen, niet om avonden te verdoen aan declaraties,
             bankafschriften en facturen. Wij optimaliseren uw complete financiële workflow.

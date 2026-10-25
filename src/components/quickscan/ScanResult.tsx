@@ -81,7 +81,7 @@ export function ScanResultView({ scan, result, answers, peerScores }: Props) {
           />
         ))}
         <figcaption className="mt-3 text-center text-sm text-muted-foreground">
-          Indicatief: de uren en het bedrag zijn een schatting op basis van je score.
+          Indicatief: de uren en het bedrag zijn een schatting op basis van je score. In de diepgaande analyse na de quickscan werken we dit voor jouw situatie uit.
         </figcaption>
       </figure>
 

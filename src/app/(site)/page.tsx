@@ -7,6 +7,7 @@ import { WorkflowSteps } from "@/components/site/WorkflowSteps";
 import { getScan, getScans } from "@/lib/quickscan/scans";
 import { getCategoryAverages } from "@/lib/quickscan/leads";
 import { getAllCases } from "@/lib/cases";
+import { FaqSection } from "@/components/site/FaqSection";
 
 /**
  * Geen eigen openGraph/twitter hier: die velden worden per key volledig
@@ -194,13 +195,15 @@ export default async function HomePage() {
         </div>
       )}
 
+      <FaqSection />
+
       <div id="gesprek" className="mx-auto max-w-[1200px] px-6 py-[clamp(56px,10vw,100px)] text-center">
         <h2 className={`m-0 mb-[18px] text-[clamp(26px,4vw,36px)] font-bold tracking-[-0.02em] ${heading}`}>
           Wil je weten wat automatisering jou oplevert?
         </h2>
         <p className="mx-auto mb-8 max-w-[520px] text-[17px] text-muted-foreground">
-          Doe de gratis quickscan en ontvang direct een indicatie van je tijd- en
-          kostenbesparing.
+          Doe de gratis quickscan en zie direct in hoofdlijnen waar de knelpunten in je
+          financiële proces zitten. Daarna volgt een diepgaande analyse.
         </p>
         <QuickscanDropdown
           scans={visibleScans}
