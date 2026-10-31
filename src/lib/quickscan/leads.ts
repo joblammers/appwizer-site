@@ -85,7 +85,7 @@ export async function startLead(input: StartLeadInput): Promise<number | null> {
 }
 
 interface SaveLeadInput {
-  /** Id van een eerdere startLead()-rij om bij te werken; ontbreekt die (of bestaat de rij niet meer), dan volgt een nieuwe insert. */
+  /** Id van een eerdere startLead()-rij om bij te werken. Alleen een nog onvoltooide rij van dezelfde scan en hetzelfde e-mailadres wordt bijgewerkt (de id's lopen op, dus een willekeurige id mag nooit een andere lead overschrijven); anders volgt een nieuwe insert. */
   leadId?: number | null;
   scanSlug: string;
   firstName: string;
@@ -123,6 +123,9 @@ export async function saveLead(input: SaveLeadInput): Promise<void> {
         completed = true,
         updated_at = now()
       where id = ${input.leadId}
+        and scan_slug = ${input.scanSlug}
+        and completed = false
+        and lower(email) = lower(${input.email})
       returning id
     `) as { id: number }[];
     if (updated.length > 0) return;

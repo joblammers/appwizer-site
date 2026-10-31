@@ -90,7 +90,8 @@ zonder een variabele valt de bijbehorende functie weg in plaats van te falen.
 | Variabele | Doel |
 | --- | --- |
 | `DATABASE_URL` (of `POSTGRES_URL`) | Neon/Postgres: scans, leads, cases, MCP-tenants |
-| `ADMIN_PASSWORD` | Het ene gedeelde wachtwoord voor `/admin` |
+| `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Inloggen op `/admin` via Clerk; zonder sleutels geeft `/admin` een 503 |
+| `ADMIN_EMAILS` | Komma-gescheiden e-mailadressen die admin mogen zijn (allowlist bovenop Clerk) |
 | `QUICKSCAN_WEBHOOK_URL` | Webhook (Zapier/Make/HubSpot) per ingevulde scan |
 | `RESEND_API_KEY`, `QUICKSCAN_NOTIFY_EMAIL`, `QUICKSCAN_FROM_EMAIL` | Mails via Resend (rapport, notificatie, tenant-mails) |
 | `WORDPRESS_ORIGIN` | Fallback-proxy naar de bestaande WordPress-site (niet `appwizer.com` zelf) |
@@ -117,10 +118,11 @@ Op `/admin` kun je categorieën, vragen, profielvragen en niveaus per scan
 bewerken via een webinterface, of een hele scan als JSON downloaden/uploaden —
 zonder dat je de `.ts`-bestanden hoeft aan te passen of opnieuw te deployen.
 
-Twee variabelen zijn er samen verantwoordelijk voor:
+Twee dingen zijn er samen verantwoordelijk voor:
 
-- **`ADMIN_PASSWORD`** — één gedeeld wachtwoord, geen gebruikersbeheer. Zonder
-  deze variabele kun je niet inloggen op `/admin/login`.
+- **Clerk + `ADMIN_EMAILS`** — inloggen verloopt via Clerk; alleen geverifieerde
+  e-mailadressen uit `ADMIN_EMAILS` komen binnen (fail closed: leeg = niemand).
+  Zonder Clerk-sleutels geeft `/admin` een 503.
 - **`DATABASE_URL`** — een Neon/Postgres-connectiestring. Zonder deze
   variabele toont `/admin` de scans uit `src/lib/quickscan/scans/*.ts` wel,
   maar kan er niets worden opgeslagen (`saveScan`/`deleteScan` gooien dan een
@@ -139,9 +141,10 @@ initiële/seed-inhoud. Beide routes zijn daarom dynamisch gerenderd (niet meer
 statisch voorgerenderd): een wijziging in `/admin` is direct zichtbaar op de
 site, zonder redeploy.
 
-Beveiliging: `src/proxy.ts` blokkeert onbevoegde navigatie naar `/admin/*`, en
-elke server action in `src/app/(site)/admin/actions.ts` controleert de sessie
-nogmaals zelf — Server Functions zijn ook als directe POST-aanroep bereikbaar,
+Beveiliging: `src/proxy.ts` (Clerk) blokkeert niet-ingelogde navigatie naar
+`/admin/*`, en de admin-layout en elke server action in
+`src/app/(site)/admin/*-actions.ts` controleren sessie én allowlist
+nogmaals zelf (`src/lib/admin/auth.ts`) — Server Functions zijn ook als directe POST-aanroep bereikbaar,
 niet alleen via de UI.
 
 ## Ontwerpkeuzes

@@ -1,4 +1,5 @@
 import { isDatabaseConfigured, sql } from "@/lib/db";
+import { escapeHtml } from "@/lib/escapeHtml";
 
 /**
  * Leest/schrijft de échte MCP-aanmeldingen — niet via `mcp-db.ts`'s
@@ -70,13 +71,13 @@ async function notifyApproved(record: KvTenantRecord): Promise<void> {
     record.contactEmail,
     `Je ${system}-koppeling met Claude is actief`,
     `<p>Hoi,</p>
-     <p>Goed nieuws: de koppeling tussen ${system} van <strong>${record.name}</strong> en Claude is goedgekeurd.</p>
+     <p>Goed nieuws: de koppeling tussen ${system} van <strong>${escapeHtml(record.name)}</strong> en Claude is goedgekeurd.</p>
      ${
        connectorUrl
          ? `<p><strong>Zo voeg je hem toe in Claude</strong></p>
             <ol>
               <li>Ga naar Instellingen → Connectors → Custom connector toevoegen.</li>
-              <li>Vul als URL in: <code style="background:#eef3f9;padding:2px 6px;border-radius:6px">${connectorUrl}</code></li>
+              <li>Vul als URL in: <code style="background:#eef3f9;padding:2px 6px;border-radius:6px">${escapeHtml(connectorUrl)}</code></li>
               <li>Klik op Verbinden en log in bij ${system}.</li>
             </ol>`
          : `<p>We nemen op korte termijn contact met je op met de connector-URL.</p>`
@@ -92,7 +93,7 @@ async function notifySuspended(record: KvTenantRecord): Promise<void> {
     record.contactEmail,
     `Je ${system}-koppeling met Claude is gepauzeerd`,
     `<p>Hoi,</p>
-     <p>De koppeling tussen ${system} van <strong>${record.name}</strong> en Claude is zojuist gepauzeerd. De connector werkt tot nader order niet meer.</p>
+     <p>De koppeling tussen ${system} van <strong>${escapeHtml(record.name)}</strong> en Claude is zojuist gepauzeerd. De connector werkt tot nader order niet meer.</p>
      <p>Vragen hierover? Beantwoord deze mail of schrijf naar support@appwizer.com.</p>`,
   );
 }
@@ -104,7 +105,7 @@ async function notifyDeleted(record: KvTenantRecord): Promise<void> {
     record.contactEmail,
     `Je aanmelding voor de ${system}-koppeling is verwijderd`,
     `<p>Hoi,</p>
-     <p>De aanmelding voor de ${system}-koppeling van <strong>${record.name}</strong> met Claude is verwijderd.</p>
+     <p>De aanmelding voor de ${system}-koppeling van <strong>${escapeHtml(record.name)}</strong> met Claude is verwijderd.</p>
      <p>Had je dit niet verwacht, of wil je je opnieuw aanmelden? Beantwoord deze mail of schrijf naar support@appwizer.com.</p>`,
   );
 }

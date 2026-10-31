@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getScan } from "@/lib/quickscan/scans";
 import { getCategoryAverages } from "@/lib/quickscan/leads";
 import { decodeAnswers } from "@/lib/quickscan/resultLink";
+import { sanitizeAnswers } from "@/lib/quickscan/input";
 import { ScanRunner } from "@/components/quickscan/ScanRunner";
 import { JsonLd } from "@/components/JsonLd";
 import { BASE_OPEN_GRAPH, BASE_TWITTER } from "@/lib/seo";
@@ -38,7 +39,8 @@ export default async function QuickscanPage({ params, searchParams }: PageProps)
   const scan = await getScan(slug);
   if (!scan) notFound();
 
-  const sharedAnswers = r ? decodeAnswers(r) : null;
+  const decoded = r ? decodeAnswers(r) : null;
+  const sharedAnswers = decoded ? sanitizeAnswers(scan, decoded, false) : null;
   const peerScores = await getCategoryAverages(scan.slug);
 
   return (

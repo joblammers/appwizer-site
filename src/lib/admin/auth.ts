@@ -1,45 +1,43 @@
-import { createHash, timingSafeEqual } from "node:crypto";
-import { cookies } from "next/headers";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
-export const ADMIN_SESSION_COOKIE = "admin_session";
-
-function sessionToken(password: string): string {
-  return createHash("sha256").update(password).digest("hex");
+/**
+ * Inloggen verloopt via Clerk; wie er binnenmag bepaalt ADMIN_EMAILS
+ * (komma-gescheiden lijst). Clerk bewijst alleen wie iemand is — zonder
+ * deze allowlist zou elk Clerk-account (bv. via zelf aanmelden) admin zijn.
+ * Ontbreekt ADMIN_EMAILS, dan heeft niemand toegang (fail closed).
+ */
+export function allowedAdminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
 }
 
-export function isAdminConfigured(): boolean {
-  return Boolean(process.env.ADMIN_PASSWORD);
-}
+/** E-mailadres van de ingelogde admin, of null bij geen sessie / geen toegang. Alleen geverifieerde adressen tellen. */
+export async function getAdminEmail(): Promise<string | null> {
+  const allowed = allowedAdminEmails();
+  if (allowed.length === 0) return null;
 
-export function checkPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
-  return Boolean(expected) && password === expected;
-}
+  const { userId } = await auth();
+  if (!userId) return null;
 
-export function createSessionToken(): string {
-  const password = process.env.ADMIN_PASSWORD;
-  if (!password) throw new Error("ADMIN_PASSWORD is niet gezet.");
-  return sessionToken(password);
-}
+  const user = await currentUser();
+  if (!user) return null;
 
-export function isValidSessionToken(token: string | undefined | null): boolean {
-  const password = process.env.ADMIN_PASSWORD;
-  if (!password || !token) return false;
-  const expected = Buffer.from(sessionToken(password));
-  const actual = Buffer.from(token);
-  return expected.length === actual.length && timingSafeEqual(expected, actual);
+  const verified = user.emailAddresses
+    .filter((address) => address.verification?.status === "verified")
+    .map((address) => address.emailAddress.toLowerCase());
+  return verified.find((email) => allowed.includes(email)) ?? null;
 }
 
 /**
  * Server Functions zijn ook als directe POST-aanroep bereikbaar, niet alleen
- * via de UI (zie Next.js-docs "Mutating Data"). proxy.ts weert onbevoegde
- * GET-navigatie naar /admin/*, maar elke server action controleert de sessie
- * hier nogmaals voordat hij iets wijzigt.
+ * via de UI (zie Next.js-docs "Mutating Data"). proxy.ts weert niet-ingelogde
+ * navigatie naar /admin/*, maar elke server action controleert hier nogmaals
+ * sessie én allowlist voordat hij iets wijzigt.
  */
 export async function requireAdminSession(): Promise<void> {
-  const store = await cookies();
-  const token = store.get(ADMIN_SESSION_COOKIE)?.value;
-  if (!isValidSessionToken(token)) {
-    throw new Error("Niet ingelogd.");
+  if (!(await getAdminEmail())) {
+    throw new Error("Niet ingelogd of geen toegang.");
   }
 }

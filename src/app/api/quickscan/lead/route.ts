@@ -4,6 +4,9 @@ import { scoreScan, formatPercentage } from "@/lib/quickscan/scoring";
 import { saveLead } from "@/lib/quickscan/leads";
 import { buildResultUrl } from "@/lib/quickscan/resultLink";
 import type { LeadPayload } from "@/lib/quickscan/types";
+import { cleanString, sanitizeAnswers, sanitizeProfile } from "@/lib/quickscan/input";
+import { escapeHtml as e } from "@/lib/escapeHtml";
+import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 /**
  * Ontvangt een ingevulde quickscan, rekent de score server-side opnieuw door
@@ -21,21 +24,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ongeldige invoer" }, { status: 400 });
   }
 
-  const scan = await getScan(payload.scanSlug);
+  if (!payload || typeof payload !== "object") {
+    return NextResponse.json({ error: "Ongeldige invoer" }, { status: 400 });
+  }
+
+  // Elke inzending verstuurt mails vanaf ons domein: begrens per IP.
+  if (!(await rateLimit(`lead:ip:${clientIp(request)}`, 10, 3600))) {
+    return NextResponse.json({ error: "Te veel pogingen, probeer het later opnieuw" }, { status: 429 });
+  }
+
+  const scan = await getScan(cleanString(payload.scanSlug, 100));
   if (!scan) {
     return NextResponse.json({ error: "Onbekende scan" }, { status: 400 });
   }
 
-  if (!payload.consent) {
+  if (payload.consent !== true) {
     return NextResponse.json({ error: "Toestemming ontbreekt" }, { status: 400 });
   }
 
-  const email = (payload.email ?? "").trim();
+  const email = cleanString(payload.email, 254);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Ongeldig e-mailadres" }, { status: 400 });
   }
 
-  const answers = payload.answers ?? {};
+  // Ook de ontvanger van de rapport-mail begrenzen, zodat niemand met een
+  // vreemd adres als bestemming mails kan laten sturen.
+  if (!(await rateLimit(`lead:email:${email.toLowerCase()}`, 5, 86400))) {
+    return NextResponse.json({ error: "Te veel pogingen, probeer het later opnieuw" }, { status: 429 });
+  }
+
+  const answers = sanitizeAnswers(scan, payload.answers, true);
+  const profile = sanitizeProfile(payload.profile);
+  if (!answers || !profile) {
+    return NextResponse.json({ error: "Ongeldige antwoorden" }, { status: 400 });
+  }
   const isComplete = scan.questions.every((q) => answers[q.id] !== undefined);
 
   const result = scoreScan(scan, answers);
@@ -47,10 +69,10 @@ export async function POST(request: Request) {
   const lead: Lead = {
     receivedAt: new Date().toISOString(),
     scan: scan.slug,
-    firstName: (payload.firstName ?? "").trim().slice(0, 80),
+    firstName: cleanString(payload.firstName, 80),
     email,
-    company: (payload.company ?? "").trim().slice(0, 120),
-    phone: (payload.phone ?? "").trim().slice(0, 40) || undefined,
+    company: cleanString(payload.company, 120),
+    phone: cleanString(payload.phone, 40) || undefined,
     score: formatPercentage(result.percentage),
     weightedScore: formatPercentage(result.weightedPercentage),
     tier: result.tier.level,
@@ -63,7 +85,7 @@ export async function POST(request: Request) {
       category: c.name,
       score: formatPercentage(c.percentage),
     })),
-    profile: payload.profile ?? {},
+    profile,
     answers,
     resultUrl,
   };
@@ -77,14 +99,14 @@ export async function POST(request: Request) {
     // leadtabel niet vervuilen met onbruikbare rijen.
     isComplete
       ? saveLead({
-          leadId: payload.leadId,
+          leadId: Number.isSafeInteger(payload.leadId) ? payload.leadId : undefined,
           scanSlug: scan.slug,
           firstName: lead.firstName,
           email: lead.email,
           company: lead.company,
           phone: lead.phone,
           result,
-          profile: payload.profile ?? {},
+          profile,
           answers,
         })
       : Promise.resolve(),
@@ -138,7 +160,7 @@ async function notifyByEmail(lead: Lead) {
   if (!apiKey || !to) return;
 
   const rows = lead.categoryScores
-    .map((c) => `<tr><td>${c.category}</td><td>${c.score}</td></tr>`)
+    .map((c) => `<tr><td>${e(c.category)}</td><td>${e(c.score)}</td></tr>`)
     .join("");
 
   await fetch("https://api.resend.com/emails", {
@@ -152,13 +174,13 @@ async function notifyByEmail(lead: Lead) {
       to,
       subject: `Quickscan ${lead.scan}: ${lead.company} — ${lead.score}`,
       html: `
-        <h2>${lead.company}</h2>
-        <p>${lead.firstName} — ${lead.email}${lead.phone ? ` — ${lead.phone}` : ""}</p>
-        <p><strong>${lead.score}</strong> (gewogen ${lead.weightedScore}) — ${lead.tier}</p>
-        <p>Grootste verbeterpotentie: ${lead.lowestCategory}</p>
+        <h2>${e(lead.company)}</h2>
+        <p>${e(lead.firstName)} — ${e(lead.email)}${lead.phone ? ` — ${e(lead.phone)}` : ""}</p>
+        <p><strong>${e(lead.score)}</strong> (gewogen ${e(lead.weightedScore)}) — ${e(lead.tier)}</p>
+        <p>Grootste verbeterpotentie: ${e(lead.lowestCategory)}</p>
         <table border="1" cellpadding="6" cellspacing="0">${rows}</table>
-        <p><a href="${lead.resultUrl}">Bekijk de uitslag zoals de deelnemer die ziet</a></p>
-        <pre>${JSON.stringify(lead.profile, null, 2)}</pre>
+        <p><a href="${e(lead.resultUrl)}">Bekijk de uitslag zoals de deelnemer die ziet</a></p>
+        <pre>${e(JSON.stringify(lead.profile, null, 2))}</pre>
       `,
     }),
   });
@@ -173,14 +195,14 @@ async function sendResultEmail(lead: Lead) {
     .map(
       (c) => `
         <tr>
-          <td style="padding:6px 12px 6px 0; color:#334155;">${c.category}</td>
-          <td style="padding:6px 0; text-align:right; font-weight:600; color:#0f172a;">${c.score}</td>
+          <td style="padding:6px 12px 6px 0; color:#334155;">${e(c.category)}</td>
+          <td style="padding:6px 0; text-align:right; font-weight:600; color:#0f172a;">${e(c.score)}</td>
         </tr>`,
     )
     .join("");
 
   const stepsList = lead.tierSteps
-    .map((step) => `<li style="margin-bottom:4px;">${step}</li>`)
+    .map((step) => `<li style="margin-bottom:4px;">${e(step)}</li>`)
     .join("");
 
   await fetch("https://api.resend.com/emails", {
@@ -194,10 +216,10 @@ async function sendResultEmail(lead: Lead) {
       to: lead.email,
       subject: `Je quickscan-uitslag: ${lead.score} — ${lead.tier}`,
       html: `
-        <p>Hoi ${lead.firstName},</p>
+        <p>Hoi ${e(lead.firstName)},</p>
         <p>Bedankt voor het invullen van de quickscan. Je score is
-        <strong>${lead.score}</strong> — <strong>${lead.tier}</strong>.</p>
-        <p style="color:#334155;">${lead.tierHeadline}</p>
+        <strong>${e(lead.score)}</strong> — <strong>${e(lead.tier)}</strong>.</p>
+        <p style="color:#334155;">${e(lead.tierHeadline)}</p>
 
         <h3 style="margin-top:24px; margin-bottom:8px;">Je score per onderdeel</h3>
         <table cellpadding="0" cellspacing="0" style="width:100%; max-width:420px; border-collapse:collapse;">
@@ -205,16 +227,16 @@ async function sendResultEmail(lead: Lead) {
         </table>
 
         <h3 style="margin-top:24px; margin-bottom:8px;">Wat dit betekent</h3>
-        <p style="color:#334155;">${lead.tierBody}</p>
+        <p style="color:#334155;">${e(lead.tierBody)}</p>
 
         <h3 style="margin-top:24px; margin-bottom:8px;">De drie stappen die nu het meeste opleveren</h3>
         <ol style="color:#334155; padding-left:20px;">${stepsList}</ol>
 
-        <h3 style="margin-top:24px; margin-bottom:8px;">Waar je het meeste laat liggen: ${lead.lowestCategory}</h3>
-        <p style="color:#334155;">${lead.lowestCategoryAdvice}</p>
+        <h3 style="margin-top:24px; margin-bottom:8px;">Waar je het meeste laat liggen: ${e(lead.lowestCategory)}</h3>
+        <p style="color:#334155;">${e(lead.lowestCategoryAdvice)}</p>
 
         <p style="margin-top:28px;">
-          <a href="${lead.resultUrl}" style="display:inline-block; background:#DF7D3C; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+          <a href="${e(lead.resultUrl)}" style="display:inline-block; background:#DF7D3C; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
             Bekijk je volledige uitslag
           </a>
         </p>
